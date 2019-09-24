@@ -6,9 +6,12 @@ repo_directory = joinpath(@__DIR__,"..")
 cssfile = joinpath(@__DIR__, "..", "templates", "skeleton_css.css")
 latexfile = joinpath(@__DIR__, "..", "templates", "julia_tex.tpl")
 
-function weave_file(folder,file,build_list=(:script,:html,:pdf,:notebook); kwargs...)
+function weave_file(folder,file,build_list=(:script,:html,:notebook); kwargs...)
+  @show build_list
   tmp = joinpath(repo_directory,"tutorials",folder,file)
+  @show tmp
   args = Dict{Symbol,String}(:folder=>folder,:file=>file)
+  @show(args)
   if :script ∈ build_list
     println("Building Script")
     dir = joinpath(repo_directory,"script",folder)
@@ -20,12 +23,6 @@ function weave_file(folder,file,build_list=(:script,:html,:pdf,:notebook); kwarg
     dir = joinpath(repo_directory,"html",folder)
     isdir(dir) || mkdir(dir)
     weave(tmp,doctype = "md2html",out_path=dir,args=args; css=cssfile, kwargs...)
-  end
-  if :pdf ∈ build_list
-    println("Building PDF")
-    dir = joinpath(repo_directory,"pdf",folder)
-    isdir(dir) || mkdir(dir)
-    weave(tmp,doctype="md2pdf",out_path=dir,args=args; template=latexfile, kwargs...)
   end
   if :github ∈ build_list
     println("Building Github Markdown")
@@ -39,6 +36,13 @@ function weave_file(folder,file,build_list=(:script,:html,:pdf,:notebook); kwarg
     isdir(dir) || mkdir(dir)
     Weave.convert_doc(tmp,joinpath(dir,file[1:end-4]*".ipynb"))
   end
+#=  if :pdf ∈ build_list
+    println("Building PDF")
+    dir = joinpath(repo_directory,"pdf",folder)
+    isdir(dir) || mkdir(dir)
+    weave(tmp,doctype="md2pdf",out_path=dir,args=args; template=latexfile, kwargs...)
+  end
+=#
 end
 
 function weave_all()

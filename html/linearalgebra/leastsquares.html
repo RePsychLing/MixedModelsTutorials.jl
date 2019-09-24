@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<HTML lang = "en">
+<HEAD>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Linear Algebra - solving least squares problems</title>
+  
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: { equationNumbers: { autoNumber: "AMS" } }
+    });
+  </script>
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+<style>
+pre.hljl {
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 5px;
+    overflow-x: auto;
+    color: rgb(68,68,68); background-color: rgb(251,251,251); }
+pre.hljl > span.hljl-t { }
+pre.hljl > span.hljl-w { }
+pre.hljl > span.hljl-e { }
+pre.hljl > span.hljl-eB { }
+pre.hljl > span.hljl-o { }
+pre.hljl > span.hljl-k { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kc { color: rgb(59,151,46); font-style: italic; }
+pre.hljl > span.hljl-kd { color: rgb(214,102,97); font-style: italic; }
+pre.hljl > span.hljl-kn { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kp { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kr { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kt { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-n { }
+pre.hljl > span.hljl-na { }
+pre.hljl > span.hljl-nb { }
+pre.hljl > span.hljl-nbp { }
+pre.hljl > span.hljl-nc { }
+pre.hljl > span.hljl-ncB { }
+pre.hljl > span.hljl-nd { color: rgb(214,102,97); }
+pre.hljl > span.hljl-ne { }
+pre.hljl > span.hljl-neB { }
+pre.hljl > span.hljl-nf { color: rgb(66,102,213); }
+pre.hljl > span.hljl-nfm { color: rgb(66,102,213); }
+pre.hljl > span.hljl-np { }
+pre.hljl > span.hljl-nl { }
+pre.hljl > span.hljl-nn { }
+pre.hljl > span.hljl-no { }
+pre.hljl > span.hljl-nt { }
+pre.hljl > span.hljl-nv { }
+pre.hljl > span.hljl-nvc { }
+pre.hljl > span.hljl-nvg { }
+pre.hljl > span.hljl-nvi { }
+pre.hljl > span.hljl-nvm { }
+pre.hljl > span.hljl-l { }
+pre.hljl > span.hljl-ld { color: rgb(148,91,176); font-style: italic; }
+pre.hljl > span.hljl-s { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sa { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sb { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sc { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sd { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdC { color: rgb(201,61,57); }
+pre.hljl > span.hljl-se { color: rgb(59,151,46); }
+pre.hljl > span.hljl-sh { color: rgb(201,61,57); }
+pre.hljl > span.hljl-si { }
+pre.hljl > span.hljl-so { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sr { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ss { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ssB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-nB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nbB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nfB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nh { color: rgb(59,151,46); }
+pre.hljl > span.hljl-ni { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nil { color: rgb(59,151,46); }
+pre.hljl > span.hljl-noB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-oB { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-ow { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-p { }
+pre.hljl > span.hljl-c { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-ch { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cm { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cp { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cpB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cs { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-csB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-g { }
+pre.hljl > span.hljl-gd { }
+pre.hljl > span.hljl-ge { }
+pre.hljl > span.hljl-geB { }
+pre.hljl > span.hljl-gh { }
+pre.hljl > span.hljl-gi { }
+pre.hljl > span.hljl-go { }
+pre.hljl > span.hljl-gp { }
+pre.hljl > span.hljl-gs { }
+pre.hljl > span.hljl-gsB { }
+pre.hljl > span.hljl-gt { }
+</style>
+
+
+
+  <style type="text/css">
+  @font-face {
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 600;
+}
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+body {
+  margin: 0;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0; /* 1 */
+  padding: 0; /* 2 */
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+table {
+  font-family: monospace, monospace;
+  font-size : 0.8em;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+thead th {
+    border-bottom: 1px solid black;
+    background-color: white;
+}
+tr:nth-child(odd){
+  background-color: rgb(248,248,248);
+}
+
+
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/29/2014
+*/
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box; }
+@media (min-width: 400px) {
+  .container {
+    width: 85%;
+    padding: 0; }
+}
+@media (min-width: 550px) {
+  .container {
+    width: 80%; }
+  .column,
+  .columns {
+    margin-left: 4%; }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0; }
+
+  .one.column,
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
+
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
+
+  .one-half.column                { width: 48%; }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
+  .offset-by-two.column,
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
+  .offset-by-three.column,
+  .offset-by-three.columns        { margin-left: 26%;            }
+  .offset-by-four.column,
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
+  .offset-by-five.column,
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
+  .offset-by-six.column,
+  .offset-by-six.columns          { margin-left: 52%;            }
+  .offset-by-seven.column,
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
+  .offset-by-eight.column,
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
+  .offset-by-nine.column,
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
+  .offset-by-ten.column,
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns     { margin-left: 52%; }
+
+}
+html {
+  font-size: 62.5%; }
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222; }
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: 300; }
+h1 { font-size: 3.6rem; line-height: 1.2;  letter-spacing: -.1rem;}
+h2 { font-size: 3.4rem; line-height: 1.25; letter-spacing: -.1rem; }
+h3 { font-size: 3.2rem; line-height: 1.3;  letter-spacing: -.1rem; }
+h4 { font-size: 2.8rem; line-height: 1.35; letter-spacing: -.08rem; }
+h5 { font-size: 2.4rem; line-height: 1.5;  letter-spacing: -.05rem; }
+h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
+
+p {
+  margin-top: 0; }
+a {
+  color: #1EAEDB; }
+a:hover {
+  color: #0FA0CE; }
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  color: #333;
+  border-color: #888;
+  outline: 0; }
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  color: #FFF;
+  background-color: #33C3F0;
+  border-color: #33C3F0; }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  color: #FFF;
+  background-color: #1EAEDB;
+  border-color: #1EAEDB; }
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box; }
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; }
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid #33C3F0;
+  outline: 0; }
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600; }
+fieldset {
+  padding: 0;
+  border-width: 0; }
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline; }
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal; }
+ul {
+  list-style: circle; }
+ol {
+  list-style: decimal; }
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%; }
+li > p {margin : 0;}
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #E1E1E1; }
+th:first-child,
+td:first-child {
+  padding-left: 0; }
+th:last-child,
+td:last-child {
+  padding-right: 0; }
+button,
+.button {
+  margin-bottom: 1rem; }
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.5rem; }
+pre,
+blockquote,
+dl,
+figure,
+table,
+p,
+ul,
+ol,
+form {
+  margin-bottom: 1.0rem; }
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 1px solid #E1E1E1; }
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre.hljl {
+  margin: 0 0 10px;
+  display: block;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding : 5px;
+}
+
+pre.output {
+  background: #ffffff;
+}
+
+pre.code {
+  background: #ffffff;
+}
+
+pre.julia-error {
+  color : red
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+}
+
+
+@media (min-width: 400px) {}
+@media (min-width: 550px) {}
+@media (min-width: 750px) {}
+@media (min-width: 1000px) {}
+@media (min-width: 1200px) {}
+
+h1.title {margin-top : 20px}
+img {max-width : 100%}
+div.title {text-align: center;}
+
+  </style>
+
+
+
+</HEAD>
+  <BODY>
+    <div class ="container">
+      <div class = "row">
+        <div class = "col-md-12 twelve columns">
+
+          <div class="title">
+            <h1 class="title">Linear Algebra - solving least squares problems</h1>
+            <h5>Douglas Bates</h5>
+            
+          </div>
+
+          <h1>Linear algebra and statistical models</h1>
+<p><code>Julia</code> provides one of the best, if not <em>the best</em>, environments for numerical linear algebra.</p>
+<p>The <code>Base</code> package provides basic array &#40;vector, matrix, etc.&#41; construction and manipulation; <code>*</code>, <code>/</code>, <code>\</code>, <code>&#39;</code>.  The <code>LinearAlgebra</code> package provides many definitions of matrix types &#40;<code>Diagonal</code>, <code>UpperTriangular</code>, ...&#41; and factorizations.  The <code>SparseArrays</code> packages provides types and methods for sparse matrices.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>A</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rand</span><span class='hljl-p'>(</span><span class='hljl-ni'>4</span><span class='hljl-p'>,</span><span class='hljl-ni'>3</span><span class='hljl-p'>)</span><span class='hljl-t'>   </span><span class='hljl-cs'># simulate a matrix with elements selected at random from (0,1)</span>
+</pre>
+
+
+<pre class="output">
+4×3 Array&#123;Float64,2&#125;:
+ 0.871159  0.273019  0.264304
+ 0.419799  0.11469   0.609529
+ 0.559835  0.84473   0.876732
+ 0.581368  0.634278  0.361042
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>B</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rand</span><span class='hljl-p'>(</span><span class='hljl-ni'>3</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>4</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+3×4 Array&#123;Float64,2&#125;:
+ 0.40449    0.977604  0.777997  0.421952 
+ 0.0655067  0.455899  0.988932  0.588827 
+ 0.0560149  0.654017  0.365024  0.0609093
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>A</span><span class='hljl-oB'>&#39;</span><span class='hljl-t'>   </span><span class='hljl-cs'># &quot;lazy&quot; transpose</span>
+</pre>
+
+
+<pre class="output">
+3×4 LinearAlgebra.Adjoint&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 0.871159  0.419799  0.559835  0.581368
+ 0.273019  0.11469   0.84473   0.634278
+ 0.264304  0.609529  0.876732  0.361042
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>A</span><span class='hljl-oB'>*</span><span class='hljl-n'>B</span>
+</pre>
+
+
+<pre class="output">
+4×4 Array&#123;Float64,2&#125;:
+ 0.385065  1.14898   1.04423   0.544447
+ 0.21146   0.861326  0.662516  0.281794
+ 0.330893  1.50581   1.59096   0.787025
+ 0.296931  1.09364   1.21135   0.640781
+</pre>
+
+
+<h2>Solving least squares problems</h2>
+<p>A least squares solution is one of the building blocks for statistical models.</p>
+<p>If <code>X</code> is an <span class="math">$n\times p$</span> model matrix and <code>y</code> is an <span class="math">$n$</span>-dimensional vector of observed responses, a <em>linear model</em> is of the form</p>
+<p class="math">\[
+\mathcal{Y}\sim\mathcal{N}(\mathbf{X}\beta, \sigma^2\mathbf{I})
+\]</p>
+<p>That is, the <em>mean response</em> is modeled as a <em>linear predictor</em> , <span class="math">$\mathbf{X}\beta$</span>, depending on the <em>parameter vector</em>, <span class="math">$\beta$</span> &#40;also called <em>coefficients</em>&#41; with the covariance matrix, <span class="math">$\sigma^2\mathbf{I}$</span>.  In general the probability density for a <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">multivariate normal distribution</a> with mean <span class="math">$\mu$</span> and covariance matrix <span class="math">$\Sigma$</span> is</p>
+<p class="math">\[
+  f(\mathbf{y}|\mu,\Sigma) = \frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}
+     \exp\left(-\frac{(\mathbf{y}-\mu)'\Sigma^{-1}(\mathbf{y}-\mu)}{2}\right)
+\]</p>
+<p>where <span class="math">$|\Sigma|$</span> denotes the determinant of <span class="math">$\Sigma$</span>.</p>
+<p>When the covariance matrix is of the form <span class="math">$\sigma^2\mathbf{I}$</span> the distribution is called a <em>spherical</em> normal distribution because the contours of constant density are <span class="math">$n$</span>-dimensional spheres centered at <span class="math">$\mu$</span>. In these cases the probability density can be simplified to</p>
+<p class="math">\[
+\begin{aligned}
+   f(\mathbf{y}|\beta,\sigma)&= \frac{1}{(2\pi\sigma^2)^{n/2}} \exp\left(-\frac{(\mathbf{y}-\mathbf{X}\beta)'(\mathbf{y}-\mathbf{X}\beta)}{2\sigma^2}\right)\newline
+   &= \frac{1}{(2\pi\sigma^2)^{n/2}} \exp\left(-\frac{\|\mathbf{y}-\mathbf{X}\beta)\|^2}{2\sigma^2}\right) .
+\end{aligned}
+\]</p>
+<p>The <em>likelihood</em> of the parameters, <span class="math">$\beta$</span> and <span class="math">$\sigma$</span>, given the data, <span class="math">$\mathbf{y}$</span> &#40;and, implicitly, <span class="math">$\mathbf{X}$</span>&#41;, is the same expression as the density but with the roles of the parameters and the observations reversed</p>
+<p class="math">\[
+L(\beta,\sigma|\mathbf{y})=\frac{1}{(2\pi\sigma^2)^{n/2}} \exp\left(-\frac{\|\mathbf{y}-\mathbf{X}\beta)\|^2}{2\sigma^2}\right) .
+\]</p>
+<p>The <em>maximum likelihood estimates</em> of the parameters are the values that maximize the likelihood given the data.  It is convenient to maximize the logarithm of the likelihood, called the <em>log-likelihood</em>, instead of the likelihood.</p>
+<p class="math">\[
+\ell(\beta,\sigma|\mathbf{y})=\log L(\beta,\sigma|\mathbf{y})=
+-\frac{n}{2}\log(2\pi\sigma^2)-\frac{\|\mathbf{y}-\mathbf{X}\beta)\|^2}{2\sigma^2}
+\]</p>
+<p>&#40;Because the logarithm function is monotone increasing, the values of <span class="math">$\beta$</span> and <span class="math">$\sigma$</span> that maximize the log-likelihood also maximize the likelihood.&#41;</p>
+<p>For any value of <span class="math">$\sigma$</span> the value of <span class="math">$\beta$</span> that maximizes the log-likelihood is the value that minimizes the sum of squared residuals,</p>
+<p class="math">\[
+\widehat{\beta}=\arg\min_\beta \|\mathbf{y} - \mathbf{X}\beta\|^2
+\]</p>
+<h2>A simple linear regression model</h2>
+<p>Data from a calibration experiment on the optical density versus the concentration of Formaldehyde are available as the <code>Formaldehyde</code> data in <code>R</code>.  We use the <code>RCall</code> package to retrieve these data from <code>R</code>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>LinearAlgebra</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>RCall</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>StatsModels</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tables</span>
+</pre>
+
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Formaldehyde</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rcopy</span><span class='hljl-p'>(</span><span class='hljl-so'>R&quot;Formaldehyde&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>carb</th><th>optden</th></tr><tr><th></th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>6 rows × 2 columns</p><tr><th>1</th><td>0.1</td><td>0.086</td></tr><tr><th>2</th><td>0.3</td><td>0.269</td></tr><tr><th>3</th><td>0.5</td><td>0.446</td></tr><tr><th>4</th><td>0.6</td><td>0.538</td></tr><tr><th>5</th><td>0.7</td><td>0.626</td></tr><tr><th>6</th><td>0.9</td><td>0.782</td></tr></tbody></table>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+library(ggplot2)
+qplot(x=carb, y=optden, data=Formaldehyde, geom=&quot;point&quot;)
+&quot;&quot;&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>In a <em>simple linear regression</em> the model matrix, <span class="math">$\mathbf{X}$</span>, consists of a column of 1&#39;s and a column of the covariate values; <code>carb</code>, in this case.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>X</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>hcat</span><span class='hljl-p'>(</span><span class='hljl-nf'>ones</span><span class='hljl-p'>(</span><span class='hljl-nf'>size</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)),</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-oB'>.</span><span class='hljl-n'>carb</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+6×2 Array&#123;Float64,2&#125;:
+ 1.0  0.1
+ 1.0  0.3
+ 1.0  0.5
+ 1.0  0.6
+ 1.0  0.7
+ 1.0  0.9
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>y</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-oB'>.</span><span class='hljl-n'>optden</span>
+</pre>
+
+
+<pre class="output">
+6-element Array&#123;Float64,1&#125;:
+ 0.086
+ 0.269
+ 0.446
+ 0.538
+ 0.626
+ 0.782
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>β</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-oB'>\</span><span class='hljl-n'>y</span><span class='hljl-t'>     </span><span class='hljl-cs'># least squares estimate</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 0.005085714285714445
+ 0.876285714285714
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>r</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>y</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-oB'>*</span><span class='hljl-n'>β</span><span class='hljl-t'>   </span><span class='hljl-cs'>#residual</span>
+</pre>
+
+
+<pre class="output">
+6-element Array&#123;Float64,1&#125;:
+ -0.006714285714285853 
+  0.0010285714285713787
+  0.002771428571428536 
+  0.0071428571428572285
+  0.007514285714285807 
+ -0.011742857142857055
+</pre>
+
+
+<p>One of the conditions for <span class="math">$\hat{\beta}$</span> being the least squares estimate is that the residuals must be orthogonal to the columns of <span class="math">$\mathbf{X}$</span></p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>X</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>r</span><span class='hljl-t'>   </span><span class='hljl-cs'># not exactly zero but very small entries</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 4.163336342344337e-17
+ 1.48318857196017e-16
+</pre>
+
+
+<h2>Creating the model matrix from a formula</h2>
+<p>Creating model matrices from a data table can be a tedious and error-prone operation.  In addition, <em>statistical inference</em> regarding a linear model often considers groups of columns generated by model <em>terms</em>.  The <code>GLM</code> package provides methods to fit and analyze linear models and generalized linear models &#40;described later&#41; using a <em>formula/data</em> specification similar to that in <em>R</em>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>GLM</span>
+</pre>
+
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>m1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>LinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-p'>(</span><span class='hljl-n'>optden</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>carb</span><span class='hljl-p'>),</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.LinearModel&#123;GLM.LmResp&#123;Array&#123;Float64,1
+&#125;&#125;,GLM.DensePredChol&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2
+&#125;&#125;&#125;&#125;,Array&#123;Float64,2&#125;&#125;
+
+optden ~ 1 &#43; carb
+
+Coefficients:
+───────────────────────────────────────────────────────────────────────────
+────
+               Estimate  Std. Error    t value  Pr&#40;&gt;|t|&#41;   Lower 95&#37;  Upper
+ 95&#37;
+───────────────────────────────────────────────────────────────────────────
+────
+&#40;Intercept&#41;  0.00508571  0.00783368   0.649211    0.5516  -0.0166641  0.026
+8355
+carb         0.876286    0.0135345   64.7444      &lt;1e-6    0.838708   0.913
+864 
+───────────────────────────────────────────────────────────────────────────
+────
+</pre>
+
+
+<p>The evaluation of the formula is performed by the <code>StatsModels</code> package in stages.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-p'>(</span><span class='hljl-n'>optden</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>carb</span><span class='hljl-p'>)</span><span class='hljl-t'>
+</span><span class='hljl-n'>y</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>modelcols</span><span class='hljl-p'>(</span><span class='hljl-nf'>apply_schema</span><span class='hljl-p'>(</span><span class='hljl-n'>f1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>schema</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)),</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+&#40;&#91;0.086, 0.269, 0.446, 0.538, 0.626, 0.782&#93;, &#91;1.0 0.1; 1.0 0.3; … ; 1.0 0.7
+; 1.0 0.9&#93;&#41;
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>X</span>
+</pre>
+
+
+<pre class="output">
+6×2 Array&#123;Float64,2&#125;:
+ 1.0  0.1
+ 1.0  0.3
+ 1.0  0.5
+ 1.0  0.6
+ 1.0  0.7
+ 1.0  0.9
+</pre>
+
+
+<h2>Matrix decompositions for least squares</h2>
+<p>According to the formulas given in text books, the least squares estimates are calculated as</p>
+<p class="math">\[
+\widehat{\mathbf{\beta}}=\mathbf{X^\prime X}^{-1}\mathbf{X^\prime y}
+\]</p>
+<p>In practice, this formula is not the way the estimates are calculated, because it is wasteful to evaluate the inverse of a matrix if you just want to solve a system of equations.</p>
+<p>Recall that the least squares estimate satisfies the condition that the residual is orthogonal to the columns of <span class="math">$\mathbf{X}$</span>.</p>
+<p class="math">\[
+\mathbf{X^\prime (y - X\widehat{\beta})} = \mathbf{0}
+\]</p>
+<p>which can be re-written as</p>
+<p class="math">\[
+\mathbf{X^\prime X}\widehat{\mathbf{\beta}}=\mathbf{X^\prime y}
+\]</p>
+<p>These are called the <em>normal equations</em> - &quot;normal&quot; in the sense of orthogonal, not in the sense of the normal distribution.</p>
+<p>The matrix <span class="math">$\mathbf{X^\prime X}$</span> is symmetric and <em>positive definite</em>.  The latter condition means that</p>
+<p class="math">\[
+\mathbf{v^\prime(X^\prime X)v}=\mathbf{(Xv)^\prime Xv} = \|\mathbf{Xv}\|^2 > 0\quad\forall \mathbf{v}\ne\mathbf{0}
+\]</p>
+<p>if <span class="math">$\mathbf{X}$</span> has full column rank.</p>
+<p>We will assume that the model matrices <span class="math">$\mathbf{X}$</span> we will use do have full rank.  It is possible to handle rank-deficient model matrices but we will not cover that here.</p>
+<p>A positive-definite matrix has a &quot;square root&quot; in the sense that there is a <span class="math">$p\times p$</span> matrix <span class="math">$\mathbf{A}$</span> such that <span class="math">$\mathbf{A^\prime A}=\mathbf{X^\prime X} .$</span> In fact, when <span class="math">$p>1$</span> there are several.  A specific choice of <span class="math">$\mathbf{A}$</span> is an upper triangular matrix with positive elements on the diagonal, usually written <span class="math">$\mathbf{R}$</span> and called the upper Cholesky factor of <span class="math">$\mathbf{X^\prime X}$</span>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>X</span>
+</pre>
+
+
+<pre class="output">
+6×2 Array&#123;Float64,2&#125;:
+ 1.0  0.1
+ 1.0  0.3
+ 1.0  0.5
+ 1.0  0.6
+ 1.0  0.7
+ 1.0  0.9
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>xpx</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>X</span>
+</pre>
+
+
+<pre class="output">
+2×2 Array&#123;Float64,2&#125;:
+ 6.0  3.1 
+ 3.1  2.01
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>ch</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>cholesky</span><span class='hljl-p'>(</span><span class='hljl-n'>xpx</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;
+U factor:
+2×2 LinearAlgebra.UpperTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 2.44949  1.26557
+  ⋅       0.63901
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span>
+</pre>
+
+
+<pre class="output">
+2×2 Array&#123;Float64,2&#125;:
+ 6.0  3.1 
+ 3.1  2.01
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-n'>xpx</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+<p>Because the Cholesky factor is triangular, it is possible to solve systems of equations of the form <span class="math">$\mathbf{R^\prime R}\widehat{\mathbf{\beta}}=\mathbf{X^\prime y}$</span> in place in two stages.  First solve for <span class="math">$\mathbf{v}$</span> in <span class="math">$\mathbf{R^\prime v}=\mathbf{X^\prime y}$</span></p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>v</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>ldiv!</span><span class='hljl-p'>(</span><span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-oB'>&#39;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>y</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 1.1214580539042318
+ 0.5599550279561151
+</pre>
+
+
+<p>then solve for <span class="math">$\widehat{\mathbf{\beta}}$</span> in</p>
+<p class="math">\[
+\mathbf{R}\widehat{\mathbf{\beta}}=\mathbf{v}
+\]</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>βc</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>ldiv!</span><span class='hljl-p'>(</span><span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>copy</span><span class='hljl-p'>(</span><span class='hljl-n'>v</span><span class='hljl-p'>))</span><span class='hljl-t'>     </span><span class='hljl-cs'># solution from the Cholesky factorization</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 0.005085714285713629
+ 0.8762857142857156
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>βc</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-n'>β</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+<p>These steps are combined in one of the many <code>LinearAlgebra</code> methods for solutions of equations.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>ldiv!</span><span class='hljl-p'>(</span><span class='hljl-n'>ch</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>y</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 0.005085714285713629
+ 0.8762857142857156
+</pre>
+
+
+<h2>Sum of squared residuals as a quadratic form</h2>
+<p>Another way of approaching the least squares problem is to write the sum of squared residuals as what is called a <em>quadratic form</em>.</p>
+<p class="math">\[
+\begin{aligned}
+r^2(\mathbf{\beta}) & = \|\mathbf{y} - \mathbf{X\beta}\|^2\\
+&=\left\|\begin{bmatrix}\mathbf{X}&\mathbf{y}\end{bmatrix}\begin{bmatrix}\mathbf{-\beta}\\ 1\end{bmatrix}\right\|^2\\
+&=\begin{bmatrix}\mathbf{-\beta}&1\end{bmatrix}\begin{bmatrix}\mathbf{X^\prime X} & \mathbf{X^\prime y}\\
+  \mathbf{y^\prime X}&\mathbf{y^\prime y}\end{bmatrix}
+  \begin{bmatrix}\mathbf{-\beta}\\ 1\end{bmatrix}\\
+&=\begin{bmatrix}\mathbf{-\beta}&1\end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{R_{XX}}^\prime&\mathbf{0}\\
+    \mathbf{r_{Xy}}^\prime&r_{\mathbf{yy}}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{R_{XX}}&\mathbf{r_{Xy}}\\
+    \mathbf{0}&r_{\mathbf{yy}}
+  \end{bmatrix}
+  \begin{bmatrix}\mathbf{-\beta}\\ 1\end{bmatrix}\\
+&= \left\|  \begin{bmatrix}
+    \mathbf{R_{XX}}&\mathbf{r_{Xy}}\\
+    \mathbf{0}&r_{\mathbf{yy}}
+  \end{bmatrix}
+  \begin{bmatrix}\mathbf{-\beta}\\ 1\end{bmatrix}\right\|^2\\
+&= \|\mathbf{r_{Xy}}-\mathbf{R_{XX}\beta}\|^2 + r_{\mathbf{yy}}^2
+\end{aligned}
+\]</p>
+<p>where <span class="math">$\begin{bmatrix}\mathbf{R_{XX}}&\mathbf{r_{Xy}}\\ \mathbf{0}&r_{\mathbf{yy}}\end{bmatrix}$</span> is the upper Cholesky factor of the augmented matrix <span class="math">$\begin{bmatrix}\mathbf{X^\prime X} & \mathbf{X^\prime y}\\ \mathbf{y^\prime X}&\mathbf{y^\prime y}\end{bmatrix}$</span>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Xy</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>hcat</span><span class='hljl-p'>(</span><span class='hljl-n'>X</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>y</span><span class='hljl-p'>)</span><span class='hljl-t'>              </span><span class='hljl-cs'># augmented model matrix</span>
+</pre>
+
+
+<pre class="output">
+6×3 Array&#123;Float64,2&#125;:
+ 1.0  0.1  0.086
+ 1.0  0.3  0.269
+ 1.0  0.5  0.446
+ 1.0  0.6  0.538
+ 1.0  0.7  0.626
+ 1.0  0.9  0.782
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>cha</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>cholesky</span><span class='hljl-p'>(</span><span class='hljl-n'>Xy</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>Xy</span><span class='hljl-p'>)</span><span class='hljl-t'>        </span><span class='hljl-cs'># augmented Cholesky factor</span>
+</pre>
+
+
+<pre class="output">
+LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;
+U factor:
+3×3 LinearAlgebra.UpperTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 2.44949  1.26557  1.12146  
+  ⋅       0.63901  0.559955 
+  ⋅        ⋅       0.0172974
+</pre>
+
+
+<p>Note that <span class="math">$\mathbf{R_{XX}}$</span> is just the Cholesky factor of <span class="math">$\mathbf{X^\prime X}$</span> which was previously calculated and the vector <span class="math">$\mathbf{r_{Xy}}$</span> is the solution to <span class="math">$\mathbf{R^\prime v}=\mathbf{X^\prime y}$</span>.  The minimum sum of squares is <span class="math">$r^{\mathbf{yy}}$</span> which is attained when <span class="math">$\mathbf{\beta}$</span> is the solution to <span class="math">$\mathbf{R_{XX}}\widehat{\beta}=\mathbf{r_{Xy}}$</span></p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>RXX</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>UpperTriangular</span><span class='hljl-p'>(</span><span class='hljl-nf'>view</span><span class='hljl-p'>(</span><span class='hljl-n'>cha</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-ni'>2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-ni'>2</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+2×2 LinearAlgebra.UpperTriangular&#123;Float64,SubArray&#123;Float64,2,LinearAlgebra.
+UpperTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;,Tuple&#123;UnitRange&#123;Int64&#125;,UnitRange&#123;
+Int64&#125;&#125;,false&#125;&#125;:
+ 2.44949  1.26557
+  ⋅       0.63901
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>RXX</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-n'>ch</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>rXy</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>cha</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-ni'>2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-k'>end</span><span class='hljl-p'>]</span><span class='hljl-t'>     </span><span class='hljl-cs'># creates a copy (&quot;view&quot; doesn&#39;t copy)</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 1.1214580539042318
+ 0.5599550279561146
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>rXy</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-n'>v</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>βac</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>ldiv!</span><span class='hljl-p'>(</span><span class='hljl-n'>RXX</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>copy</span><span class='hljl-p'>(</span><span class='hljl-n'>rXy</span><span class='hljl-p'>))</span><span class='hljl-t'>     </span><span class='hljl-cs'># least squares solution from the augmented Cholesky</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 0.005085714285713991
+ 0.8762857142857148
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>βac</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-n'>β</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>abs2</span><span class='hljl-p'>(</span><span class='hljl-n'>cha</span><span class='hljl-oB'>.</span><span class='hljl-n'>U</span><span class='hljl-p'>[</span><span class='hljl-k'>end</span><span class='hljl-p'>,</span><span class='hljl-k'>end</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-nf'>sum</span><span class='hljl-p'>(</span><span class='hljl-n'>abs2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>y</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>X</span><span class='hljl-oB'>*</span><span class='hljl-n'>β</span><span class='hljl-p'>)</span><span class='hljl-t'>   </span><span class='hljl-cs'># check on residual sum of squares</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+<p>One reason for writing the least squares solution in this way is that we will use a similar decomposition for linear mixed models later.  Another is that when dealing with very large data sets we may wish to parallelize the calculation over many cores or over many processors.  The natural way to parallelize the calculation is in blocks of rows and the augmented Cholesky can be formed row by row using a <code>lowrankupdate</code>.</p>
+<h3>A row-wise approach to least squares</h3>
+<p>To show this we create a row-oriented table from our <code>Formaldehyde</code> data set, which is in a column-oriented format.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Formrows</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>Tables</span><span class='hljl-oB'>.</span><span class='hljl-nf'>rowtable</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+6-element Array&#123;NamedTuple&#123;&#40;:carb, :optden&#41;,Tuple&#123;Float64,Float64&#125;&#125;,1&#125;:
+ &#40;carb &#61; 0.1, optden &#61; 0.086&#41;
+ &#40;carb &#61; 0.3, optden &#61; 0.269&#41;
+ &#40;carb &#61; 0.5, optden &#61; 0.446&#41;
+ &#40;carb &#61; 0.6, optden &#61; 0.538&#41;
+ &#40;carb &#61; 0.7, optden &#61; 0.626&#41;
+ &#40;carb &#61; 0.9, optden &#61; 0.782&#41;
+</pre>
+
+
+<p>then initialize a Cholesky factor and zero out its contents</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>chr</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>cholesky</span><span class='hljl-p'>(</span><span class='hljl-nf'>zeros</span><span class='hljl-p'>(</span><span class='hljl-ni'>3</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>I</span><span class='hljl-p'>)</span><span class='hljl-t'>  </span><span class='hljl-cs'># initialize</span>
+</pre>
+
+
+<pre class="output">
+LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;
+U factor:
+3×3 LinearAlgebra.UpperTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 1.0  0.0  0.0
+  ⋅   1.0  0.0
+  ⋅    ⋅   1.0
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>fill!</span><span class='hljl-p'>(</span><span class='hljl-n'>chr</span><span class='hljl-oB'>.</span><span class='hljl-n'>factors</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-p'>);</span><span class='hljl-t'>   </span><span class='hljl-cs'># zero out the contents</span><span class='hljl-t'>
+</span><span class='hljl-n'>chr</span>
+</pre>
+
+
+<pre class="output">
+LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;
+U factor:
+3×3 LinearAlgebra.UpperTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 0.0  0.0  0.0
+  ⋅   0.0  0.0
+  ⋅    ⋅   0.0
+</pre>
+
+
+<p>Update by rows</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>fill!</span><span class='hljl-p'>(</span><span class='hljl-n'>chr</span><span class='hljl-oB'>.</span><span class='hljl-n'>factors</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-p'>)</span><span class='hljl-t'>
+</span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>r</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-n'>Formrows</span><span class='hljl-t'>
+    </span><span class='hljl-nf'>lowrankupdate!</span><span class='hljl-p'>(</span><span class='hljl-n'>chr</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-nfB'>1.0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>r</span><span class='hljl-oB'>.</span><span class='hljl-n'>carb</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>r</span><span class='hljl-oB'>.</span><span class='hljl-n'>optden</span><span class='hljl-p'>])</span><span class='hljl-t'>
+</span><span class='hljl-k'>end</span><span class='hljl-t'>
+</span><span class='hljl-n'>chr</span>
+</pre>
+
+
+<pre class="output">
+LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;
+U factor:
+3×3 LinearAlgebra.UpperTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 2.44949  1.26557  1.12146  
+  ⋅       0.63901  0.559955 
+  ⋅        ⋅       0.0172974
+</pre>
+
+
+<p>This is the same augmented Cholesky factor as before but obtained in a different way.  For generalized linear mixed models and for nonlinear mixed models it can be an advantage to work row-wise when performing some of the least squares calculations.</p>
+<h3>Other decompositions for least squares solutions</h3>
+<p>There are other ways of solving a least squares problem, such as using an <em>orthogonal-triangular</em> decomposition, also called a <em>QR</em> decomposition, or a singular value decomposition.  The bottom line is that we decompose <span class="math">$\mathbf{X}$</span> or <span class="math">$\mathbf{X^\prime X}$</span> into some convenient product of orthogonal or triangular or diagonal matrices and work with those.  Just to relate these ideas, the <em>QR</em> decomposition of <span class="math">$\mathbf{X}$</span> is</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>qrX</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>qr</span><span class='hljl-p'>(</span><span class='hljl-n'>X</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+LinearAlgebra.QRCompactWY&#123;Float64,Array&#123;Float64,2&#125;&#125;
+Q factor:
+6×6 LinearAlgebra.QRCompactWYQ&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ -0.408248  -0.652051  -0.373705   -0.340529  -0.307353  -0.241002
+ -0.408248  -0.339066   0.0546099   0.22072    0.386829   0.719049
+ -0.408248  -0.026082   0.868576   -0.143979  -0.156535  -0.181645
+ -0.408248   0.13041   -0.153597    0.812553  -0.221297  -0.288998
+ -0.408248   0.286902  -0.17577    -0.230915   0.71394   -0.39635 
+ -0.408248   0.599887  -0.220116   -0.31785   -0.415585   0.388946
+R factor:
+2×2 Array&#123;Float64,2&#125;:
+ -2.44949  -1.26557
+  0.0       0.63901
+</pre>
+
+
+<p>Notice that the <code>R</code> factor is the upper Cholesky factor of <span class="math">$\mathbf{X^\prime X}$</span> with the first row multiplied by -1 so its transposed product with itself is <span class="math">$\mathbf{X^\prime X}$</span>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>qrX</span><span class='hljl-oB'>.</span><span class='hljl-n'>R</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>qrX</span><span class='hljl-oB'>.</span><span class='hljl-n'>R</span>
+</pre>
+
+
+<pre class="output">
+2×2 Array&#123;Float64,2&#125;:
+ 6.0  3.1 
+ 3.1  2.01
+</pre>
+
+
+<p>That is,</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>qrX</span><span class='hljl-oB'>.</span><span class='hljl-n'>R</span><span class='hljl-oB'>&#39;</span><span class='hljl-n'>qrX</span><span class='hljl-oB'>.</span><span class='hljl-n'>R</span><span class='hljl-t'> </span><span class='hljl-oB'>≈</span><span class='hljl-t'> </span><span class='hljl-n'>xpx</span>
+</pre>
+
+
+<pre class="output">
+true
+</pre>
+
+
+<p>The original solution for <span class="math">$\widehat{\mathbf{\beta}}$</span> from the expression <code>X\y</code> is actually performed by taking a QR decomposition of <code>X</code>.</p>
+
+
+
+          <HR/>
+          <div class="footer"><p>
+          Published from <a href="leastsquares.jmd">leastsquares.jmd</a> using
+          <a href="http://github.com/mpastell/Weave.jl">Weave.jl</a>
+           on 2019-09-24.
+          <p></div>
+
+
+        </div>
+      </div>
+    </div>
+  </BODY>
+</HTML>

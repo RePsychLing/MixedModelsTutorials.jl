@@ -1,0 +1,442 @@
+
+# Statistical Models using Julia
+
+The purpose of this course is to describe some common families of statistical models and how they are related.
+
+These models are described in theory and illustrated in computational practice.  The [`Julia`](https://julialang.org) language and several Julia packages are used for the computing demonstrations because the code is in a style that is familiar to users of [`R`](https://r-project.org) or `Matlab/Octave` (and, to a lesser extent, [`Python`](https://python.org)) but it is self-contained, even for cutting-edge implementations.  Other high-level languages suffer from the "two-language" problem where the time-critical parts of the code must be written in a low-level language (e.g. `C/C++` or `Fortran`) to achieve acceptable performance on large data sets or complex models.
+
+## Overview
+
+The statistical models to be considered assume that the observed data can be represented as a _data table_ where the columns correspond to variables and the rows to instances.  One of the columns is the _response variable_.  The others are _covariates_.  Rows of the columns are _instances_.  The underlying assumption is that the response is the observed value of a random variable whose mean is a function of the covariate values for that instance.  This _mean function_ also depends on _parameters_ to be estimated.
+
+If, after data cleaning, the data table has $n$ rows then $\mathbf{y}$ is the $n$-dimensional observed response and $\mathcal{Y}$ is the corresponding $n$-dimensional random variable describing the probability model.  For _linear_ and _generalized linear_ models the mean function $\mu$ is related to the covariates by a _linear predictor expression_ of the form
+$$
+\mathbf{\eta}=\mathbf{X}\mathbf{\beta}
+$$
+where $\mathbf{X}$ is an $n\times p$ _model matrix_ and $\mathbf{\beta}$ is a $p$-dimensional _coefficient vector_.
+
+For a _nonlinear regression_ model the mean function is an expression that depends on a parameter vector, $\mathbf{\varphi}$, and the observed values of the covariates.
+
+The covariates can be on a continuous scale such as _age_, _dose_, _concentration_, etc. or _categorical_ such as _sex_, _treatment_ (as in treatment vs control), _subject_ or _item_.  The levels of a categorical covariate can be fixed, e.g. _sex_ may be recorded as "F" or "M", or they can represent a sample from a population.  Usually _subject_ is a categorical covariate whose levels are a sample from a population.  If the levels of the covariate are fixed and reproducible we model the _effect_ of changing from one level to another in the coefficient vector, $\mathbf{\beta}$, or in the parameters, $\mathbf{\varphi}$, of a nonlinear model.  The parameters involved as described as _fixed-effects_.  When the levels represent a sample from a population they can be incorporated as _random effects_, which is another level of variability in the response.  The modeling goal is to assess the variability of these random effects.
+
+A model with fixed-effects parameters and random effects is called a _mixed-effects model_ or, more simply, a _mixed model_.
+
+We now introduce the formulation of specific model types.
+
+### Linear Model
+
+The probability model can be succinctly described as
+$$
+\mathcal{Y}\sim\mathcal{N}(\mathbf{X}\mathbf{\beta},\sigma^2\mathbf{I}_n)
+$$
+where $\mathcal{N}$ denotes the multivariate normal (also called Gaussian) distribution, $\mathbf{I}_n$ is the $n\times n$ identity matrix, and $\sigma$ is a _scale parameter_.
+
+This model encompasses _simple linear regression_, _multiple linear regression_, _polynomial regression_ plus _analysis of variance_ models of many sorts.  The various flavors of these models depend on the construction of the model matrix, $\mathbf{X}$, from the data table and on the resultant interpretation of elements of the coefficient vector, $\mathbf{\beta}$, as shown later in the examples.
+
+### Generalized Linear Model
+
+In the case of a binary (Yes/No, Success/Failure, etc.) response we model the distribution of $\mathcal{Y}$ as a multivariate Bernoulli distribution, again assuming independence between elements.  (This is like saying the covariance of the multivariate Normal in linear models is a multiple of $\mathbf{I}_n$.)  However, the mean for each observation, which is the probability of "success" must be in the interval $(0,1)$. It is necessary to transform the linear predictor value, which is on an unbounded scale, $(-\infty,\infty)$, onto the restricted range.  The transformation back and forth from the linear predictor, $\eta$, scale to the mean, $\mu$, scale is called the _link function_.  For historical reasons the _link_, $g$, is defined to be the function that maps the mean to the linear predictor.  That is
+$$
+\eta = g(\mu)
+$$
+and the _inverse link_, $g^{-1}$, maps the linear predictor to the mean.
+
+A _generalized linear model_ is defined by the distribution, $\mathcal{D}$ ([Bernoulli](https://en.wikipedia.org/wiki/Bernoulli_distribution) in the case described above) and the link, $g$.  Although there are many possible functions that could be used as a link, the form of the probability mass function (or the probability density function) for distributions in the [exponential family](https://en.wikipedia.org/wiki/Exponential_family) defines a _canonical link_.  In the case of the Bernoulli the canonical link is the [logit](https://en.wikipedia.org/wiki/Logit) or _log-odds_ function
+$$
+\eta = g^{-1}(\mu)=\log\left(\frac{\mu}{1-\mu}\right)
+$$
+(Recall that for the Bernoulli the mean, $\mu$ is the probability of success, $p$ so $p/(1-p)$ is the odds ratio - hence the name _log-odds_.)
+
+The inverse link is the [logistic](https://en.wikipedia.org/wiki/Logistic_function) function
+$$
+\mu = g(\eta) = \frac{1}{1 + \exp(-\eta)} .
+$$
+
+A generalized linear model with a Bernoulli distribution and the logit link is sometimes called a _logistic regression model_.
+
+For the Poisson distribution, where the mean must be positive, the canonical link is the _log-link_.  That is
+$$
+\eta=g(\mu)=\log(\mu)
+$$
+and the inverse link is the exponential
+$$
+\mu = g^{-1}(\eta) = \exp(\eta) .
+$$
+
+A generalized linear model (GLM) can be written
+$$
+\mathcal{Y}\sim\mathcal{D}\left(\mathbf{g}^{-1}(\mathbf{X}\mathbf{\beta})\right)
+$$
+where $\mathbf{g}^{-1}$ indicates applying the scalar inverse-link function, $g^{-1}$, to each element, $\eta_i, i=1,\dots,n$, of the linear predictor to produce the corresponding element, $\mu_i$, of the mean.
+
+For the Bernoulli and Poisson distributions specifying the mean of the distribution completely determines it.  Other distributions may incorporate a scale parameter like $\sigma$ in the normal distribution.  In those cases the scale parameter is common to all the observations.
+
+## Nonlinear regression
+
+A nonlinear regression model is essentially the same as a linear model except that the parameters, $\mathbf{\varphi}$, in the mean function do not need to appear as coefficients in a linear predictor.  The model incorporates a more general mean function, $\mu(\mathbf{c}, \varphi)$, where $\mathbf{c}$ denotes the covariate values for a particular observation.  For known values of the covariates we consider the mean function as depending only on the parameters, $\varphi$, and write 
+$$
+\mathcal{Y}\sim\mathcal{N}(\mathbf{\mu}(\mathbf{\varphi}), \sigma^2\mathbf{I}_n) .
+$$
+
+Each of these model types has a corresponding mixed-effects form but we will defer that discussion until later.  At this point some examples are needed (unless you really like looking at pages of formulas).
+
+## Examples
+
+The first task is to load some data sets into Julia to illustrate the steps in defining and fitting models as described above.  For this we will use several Julia packages.  A package is loaded in a Julia session with the `using` directive.  There are several packages in a standard library available in any Julia installation.  We will use the `LinearAlgebra`, `Random` and `Statistics` packages from the standard library.  In addition, however, we will use several contributed packages that need to be added to the local package collection before they can be used.
+
+Registered Julia packages are described at https://pkg.julialang.org. (The order in which the packages are displayed is according to popularity as measured by github stars.  Notice the search panel on the upper left to allow searching by name.  A panel below the search panel allows for filtering packages by github tag.)
+
+Some of the packages we will use are:
+- `DataFrames`: a common column-oriented data table representation
+- `Distributions`: probability distribution types and associated functions
+- `GLM`: fit and examine linear and generalized linear models
+- `MixedModels`: fit and examine linear mixed models and generalized linear mixed models
+- `NLreg`: nonlinear regression
+- `RCall`: access data and functions in `R` from Julia
+- `StatsModels`: Create model matrices from a formula/data representation
+- `Tables`: transform tabular data from column-oriented (an ordered collection of named columns) to row-oriented (a vector of named _Tuples_) or vice-versa
+
+Each package will need to be added to the local collection but this only needs to be done once, although there is no harm in calling `Pkg.add` on a package that is already available.
+
+By the way, if you don't believe that Julia addresses the _2-language problem_, look at the Github repositories for these packages.  Even very complicated packages like `CSV` are written entirely in Julia. There is no need to compile performance-critical code in, say, `C++`. (And, if you don't believe that `CSV` is complicated, you haven't tried to write a package that will read CSV or other "simple" formats like tab-separated, allowing for the endlessly creative conventions that people come up with to code missing data or logical values or dates or variations on decimal separators or ...)
+
+### A simple linear regression
+
+Consider a simple data set from a calibration experiment in which optical density of a solution is measured as a function of carbohydrate concentration.  These data are available in the R `datasets` package, which can be accessed using `RCall`. First load the required Julia packages.
+
+```julia
+using DataFrames, Distributions, GLM, NLreg, RCall
+using Statistics, StatsBase, StatsModels, Tables
+```
+
+and the data table
+
+```julia
+Formaldehyde = rcopy(R"Formaldehyde")
+```
+
+Because of Julia's JIT (Just-In-Time) compiler the first use of a function like `rcopy` can take longer than expected because that function and many others must be compiled.  Subsequent uses are much faster.
+
+We have a data table stored as a `DataFrame`.
+
+```julia
+typeof(Formaldehyde)
+```
+
+We see from the printed display of the table that the columns are named `carb` and `optden` and both contain `Float64` values (i.e. double-precision floating point values).  Individual columns can be extracted as vectors by name using the `.` operator.
+
+```julia
+Formaldehyde.carb
+```
+
+Columns are considered to be "properties" of the data frame
+
+```julia
+propertynames(Formaldehyde)
+```
+
+```julia
+getproperty(Formaldehyde, :optden)
+```
+
+As indicated in the `propertynames` output, the names are of type `Symbol` which, when typed explicitly, has a leading `:`.
+
+When there are many rows or many columns in a `DataFrame` the printed display will be truncated.  For large tables the `describe` function provides a statistical summary of each column.
+
+```julia
+DataFrames.describe(Formaldehyde)
+```
+
+A plot of these data
+
+```julia
+R"""
+suppressPackageStartupMessages(library(ggplot2))
+(p <- ggplot(Formaldehyde, aes(carb, optden)) + geom_point() +
+      xlab("Carbohydrate concentration") + ylab("Optical Density"))
+"""
+```
+
+indicates a strong linear relationship between the optical density and the carbohydrate concentration, as one would wish for linear calibration.
+
+A linear model, as implemented in the `GLM` package, can be used to fit such a linear relationship.
+
+```julia
+f1 = @formula(optden ~ 1 + carb);
+m1 = fit(LinearModel, f1, Formaldehyde)
+```
+
+The formula, `optden ~ 1 + carb`, describes how the model matrix and the response vector are to be created from the data table.  The table _schema_ (names and types of columns) is applied to the formula then the model columns are created.  (The syntax `@formula(...)` is a call to a _macro_, rather than a function.  The formula language is an example of a Domain Specific Language (DSL) that must be implemented as macros to change the meaning of the syntax. The details aren't important here.)
+
+```julia
+y, X1 = modelcols(apply_schema(f1, schema(Formaldehyde)), Formaldehyde);
+X1
+```
+
+In the formula, the tilde (`~`) character is read as "is modeled by" and the `1` indicates an "intercept" term.  At this point we may be content with a very good fit as measured, say, by the _multiple correlation coefficient_.
+
+```julia
+r²(m1)   # to type the superscript 2 type \^2<tab> or use the name r2
+```
+
+but a plot of the residuals versus the fitted values reveals some curvature.
+
+```julia
+R"""
+qplot(x=$(predict(m1)), y=$(residuals(m1)), geom="point",
+      ylab="Residuals", xlab="Fitted values")
+"""
+```
+
+To some extent the curvature can also be seen in the data plot with the fitted line superimposed.
+
+```julia
+R"p + geom_abline(intercept=$(coef(m1)[1]), slope=$(coef(m1)[2]))"
+```
+
+indicates some curvature in the relationship.  It may be worthwhile fitting a quadratic relationship.
+
+## Fitting optden as a quadratic function of carb
+
+To fit a quadratic relationship we simple modify the formula
+
+```julia
+f2 = @formula(optden ~ 1 + carb + abs2(carb))
+m2 = fit(LinearModel, f2, Formaldehyde)
+```
+
+The `abs2` function is a convenient way to write `carb * carb`.  The model matrix for `m2` is
+
+```julia
+y, X2 = modelcols(apply_schema(f2, schema(Formaldehyde)), Formaldehyde); X2
+```
+
+from which we can see that each element of the third column is the square of the corresponding element of the second column.  In other words, the `abs2` function is applied row-wise during the construction of the model matrix.
+
+Notice that, although this model fits `optden` as a quadratic function of `carb`, it is nonetheless a `LinearModel`.  Recall that the _linear_ in `LinearModel` refers to the linear predictor, $\mathbf{X}\mathbf{\beta}$.  In the quadratic model it is still the case that the predicted `optden` response is a linear function of the _parameters_, $\mathbf{\beta}$, which appear are the coefficients in the linear predictor.
+
+When several models have been fit to the same data set it is natural to consider which one is to be preferred.  Model `m1` is a special case of model `m2`.  Any model that can be expressed as an intercept plus a multiple of `carb` can also be expressed in the form of `m2` by simply setting the third coefficient to zero.  The set of all possible fitted values from `m1` is a subset of those from `m2`.
+
+(For those who know the terminology, the set of vectors of the form $\mathbf{\eta}=\mathbf{X}\mathbf{\beta}, \forall\mathbf{\beta}$ is called the _column span_ of $\mathbf{X}$ and these vectors form a _linear subspace_ of the vector space of possible response vectors $\mathbf{y}$.  The dimension of the column span, also called the _degrees of freedom_ of the column span, is the number of linearly independent columns of $\mathbf{X}$.  Model `m1` is contained in model `m2` in the sense that the column span of `X1` is a linear subspace of the column span of `X2`.)
+
+The models have been fit by minimizing the sum of squared residuals, $\|\mathbf{y} - \mathbf{X}\mathbf{\beta}\|^2$.  Because model `m1` is contained in model `m2`, its sum of squared residuals must be at least as large as that of `m2`.
+
+```julia
+rss1 = sum(abs2, residuals(m1))
+```
+
+```julia
+rss2 = sum(abs2, residuals(m2))
+```
+
+The better fit from `m2` comes at a cost of 1 additional coefficient.  For nested linear models such as these an _F-test_ (named after [Sir Ronald Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher)) provides a comparison of the two models.
+
+```julia
+ftest(m2.model, m1.model)   # add a delegate method to StatsModels
+```
+
+The _p-value_ of 3.5% in the last column is generally considered to indicate that the fit of the quadratic model is "significantly better" than the fit of the simple linear model.  Technically this value is the probability of getting the results that we did or other results even more extremely in favor of the alternative (quadratic) model if these data had indeed been generated from the simple linear model.
+
+This _p-value_ is the same as that for the `abs2(carb)` coefficient in the coefficient summary table for the quadratic model. In fact, the two tests are equivalent. In the early days of computing, when fitting even the simplest model was excedingly difficult, it seemed reasonable to evaluate all the possible hypothese tests or measures of goodness of fit once the model had been fit.  Unfortunately, the practice of liberally sprinkling p-values throughout summaries of models has led to many misconceptions about their interpretation.  In some ways every F-test or t-test is a comparison of the fit of a restricted model (the _null_ model) to the fit of a more general, _alternative_ model.  One doesn't test coefficients per se - these tests are a comparison of nested models (in the sense described above, the null model is a special case of the alternative model). Without being able describe the two models being compared, it seems likely that the results of the test can be misinterpreted.
+
+##  Categorical covariates
+
+On some occasions we wish to incorporate categorical covariates, such as the treatment used in an experiment or demographic characteristics of experimental subjects, into the model.  For example, the `InsectSprays` dataset provides the counts of insects in an experiment where different insecticides were used.
+
+```julia
+InsectSprays = rcopy(R"datasets::InsectSprays")
+```
+
+Plotting the data shows that, as often occurs, there is much greater variability in the larger counts than in the smaller counts.
+
+```julia
+R"""
+(p2 <- ggplot(InsectSprays, aes(spray, count)) + geom_violin() +
+       geom_point() + xlab("Spray") +
+       ylab("Count of insects in a standard area") + coord_flip())
+"""
+```
+
+One way of adjusting for the changing variability is to model the square root of the counts instead of the counts themselves.
+
+```julia
+R"p2 + scale_y_sqrt()"
+```
+
+When a categorical covariate, such as `Spray`, is included in a model, the model matrix gets several columns associated with that one term.
+
+```julia
+f3 = @formula sqrt(count) ~ 1 + spray;
+m3 = fit(LinearModel, f3, InsectSprays)
+```
+
+```julia
+Int.(m3.mm.m)   # show Int values to emphasize differences
+```
+
+This model allows for different mean responses for the different sprays.  The interpretation of the individual coefficients is best understood by fitting an alternative representation where the model matrix is a set of indicator columns for the individual sprays.
+
+```julia
+f3a = @formula sqrt(count) ~ 0 + spray
+m3a = fit(LinearModel, f3a, InsectSprays)
+```
+
+```julia
+Int.(m3a.mm.m)
+```
+
+The six columns correspond to the six different sprays.  The first column is 1 for each observation (row) made with spray `A` and 0 for the other rows.  Similarly the second column is 1 for spray `B` and 0 for the others, and so on.  These are called _indicator columns_ for the levels of the `spray` factor.  In the machine learning literature the rows are said to have a _one-hot_ encoding in that all the elements are zero except for the one corresponding to the spray used.
+
+The first question to answer is whether the different sprays produce "significantly different" mean responses.  To phrase this as a comparison of models the null model should be a model for the same response (i.e. `sqrt(count)`) but with only one parameter representing the typical response.
+
+```julia
+m4 = fit(LinearModel, @formula(sqrt(count) ~ 1), InsectSprays)
+ftest(m3.model, m4.model)
+```
+
+```julia
+ftest(m3a.model, m4.model)
+```
+
+The answer, as one would conclude from the data plot, is that the model allowing for different means from different sprays, `m3`, does a much better job than does the one, `m4`, that requires a common mean.  Notice that the test produces the same results when comparing `m4` against either `m3` or `m3a`.  Models `m3` and `m3a`are equivalent in the sense that the column spans of the two model matrices are the same.
+
+The estimated coefficients for models `m3` and `m3a` have different interpretations even though the last five coefficients have the same names in the two models.  It is reasonably easy to understand the coefficient estimates in model `m3a`.  These are the mean or average `sqrt(count)` for each spray.
+
+```julia
+by(InsectSprays, :spray, mn = :count => x -> mean(sqrt.(x)))
+```
+
+Notice that the mean square root of the counts for spray `A` is the estimated `(Intercept)` in model `m3`.  Furthermore, the coefficient labeled `spray: B` in `m3` is the difference in the means for spray `B` and spray `A`.  We say that in model `m3` spray `A` is the reference level and the coefficients for the other sprays are the differences in means between that spray and spray `A`.
+
+The main lesson here is not to pay too much attention to individual coefficients by themselves.  They can only be interpreted in the context of the entire model.
+
+# Fitting Generalized Linear Models
+
+Another way to model the `InsectSprays` data is to consider the response, which is a count, as a realization of a [_Poisson_](https://en.wikipedia.org/wiki/Poisson_distribution) random variable with, possibly, different mean parameters for each spray.  This is an example of a generalized linear model (GLM).
+
+```julia
+f5 = @formula count ~ 1 + spray
+m5 = fit(GeneralizedLinearModel, f5, InsectSprays, Poisson())
+```
+
+The canonical link function for the Poisson distribution is the `log` function (i.e. the natural logarithm or log to the base `e`).  The linear predictor, $\mathbf{\eta}=\mathbf{X}\mathbf{\beta}$, models the logarithm of the insect count, taking into account how the variance of the Poisson distribution depends on its mean.
+
+In the case of a linear model the quality of the fit is measured by the sum of squared residuals.  For generalized linear models, the coefficients are estimated by those values that maximize the _likelihood_ of the parameters given the observed data.  (This is explained in more detail later.)
+For comparison of models we use a version of the likelihood called the _deviance_ for comparisons.  The deviance is, up to a constant, negative twice the log-likelihood.  It is the analogue of the sum of squared residuals for generalized linear models.
+
+```julia
+deviance(m5)
+```
+
+```julia
+f6 = @formula count ~ 1
+m6 = fit(GeneralizedLinearModel, f6, InsectSprays, Poisson())
+```
+
+```julia
+deviance(m6)
+```
+
+The difference in the deviance of nested GLMs is should have a $\chi^2$ distribution if the null model is "correct", where the degrees of freedom for the $\chi^2$ is the difference in the number of coefficients.  (To be more precise, it is the difference in the dimension of the column spans of the model matrices.)
+
+```julia
+dof(m5)
+```
+
+A p-value is calculated as the probability of exceeding the difference in the deviances for a $\chi^2$ with degrees of freedom given by the difference in the model degrees of freedom.
+
+```julia
+ccdf(Chisq(dof(m5) - dof(m6)), deviance(m6) - deviance(m5))
+```
+
+Again, this is a strong indication that there are differences between the sprays.
+
+# Fitting nonlinear regression models
+
+The models fit to different data sets up to this point have been _empirical models_.  That is, the form of the model is determined by examining the observed data and not based on consideration of the mechanism that may be generating the data.  The ability to extrapolate from empirical models is somewhat limited.  In contrast, parameters for mechanistic models often have an intrinsic interpretation that may apply outside the confines of the current experiment.
+
+Unfortunately, most mechanistic models do not have a convenient form that can be expressed as a linear predictor.  For example, the `Theoph` data set provides the serum concentration of the drug [Theophylline](https://en.wikipedia.org/wiki/Theophylline) in each of several volunteers at a number of times following oral administration of a dose.
+
+```julia
+Theoph = rcopy(R"Theoph")
+```
+
+```julia
+R"""
+(tpl <- ggplot(Theoph, aes(Time, conc)) + geom_point() + 
+    geom_line() + facet_wrap(~ Subject) + 
+    xlab("Time since drug adminstration (hr)") +
+    ylab("Serum concentration (mg/L)"))
+"""
+```
+
+The panels are arranged by increasing maximum concentration starting at the upper left and going across rows to the lower right.  A [pharmacokinetic](https://en.wikipedia.org/wiki/Pharmacokinetics) model for concentration in a single "compartment" after a single oral dose can be written in terms of an _elimination rate constant_, $k$, an _absorption rate constant_, $k_a$, and the effective _volume of distribution_, $V$, as
+\begin{equation}
+c(t) = \frac{\mathrm{dose}}{V} \frac{k_a - k}{k_a} \left(e^{-k\,t} - e^{-k_a\,t}\right)
+\end{equation}
+
+All three parameters - $k$, $k_a$, and $V$ - must be positive to be physically meaningful and, typically, their effect is more on a logarithmic scale.  Hence we write the model function in terms of parameters `lk`, `lka`, and `lV`, the logarithms of the parameters.  The parameters are passed to the model function as a `NamedTuple` which is a named collection of values, as is each row of data.
+
+```julia
+function sdOral1C(p, d)
+    k  = exp(p.lk)   # transform from logarithm to rate constant
+    ka = exp(p.lka)
+    V  = exp(p.lV)
+    t  = d.Time
+    (d.Dose/V) * ((ka - k)/ka) * (exp(-t*k) - exp(-t*ka))
+end
+```
+
+Although the data are in the form of a DataFrame, which is a collection of columns, each of the same length, it is more convenient to access the values row-wise.  The `Tables` package allows transformation back and forth between a column-oriented form and a row-oriented form.  Consider the data from just one subject
+
+```julia
+subj6col = first(groupby(Theoph, :Subject))
+```
+
+As a row-oriented table, this becomes
+
+```julia
+subj6row = Tables.rowtable(subj6col)
+```
+
+If we set the parameters, on the logarithm scale, to be
+
+```julia
+pars = (lk = -2.5, lka = 0.5, lV = -1.0);
+```
+
+we can evaluate the predicted concentrations as
+
+```julia
+pred0 = [sdOral1C(pars, d) for d in subj6row]
+```
+
+Finally we obtain the least squares estimates of the parameters
+
+```julia
+m7 = fit(NLregModel, subj6row, :conc, sdOral1C, pars)
+```
+
+## Review
+
+To review, we considered three types of statistical models for a response as a function of covariates.  The response is modeled as having come from a multivariate distribution, $\mathcal{Y}$.  For models based on a _linear predictor_, $\mathbf{\eta}=\mathbf{X\beta}$, the _model matrix_, $\mathbf{X}$ and the response vector, $\mathbf{y}$ are generated from the data table and a model formula.  The parameters $\mathbf{\beta}$ in the linear predictor are also called _coefficients_.
+
+The model parameters (except, possibly, for a scale parameter) affect the distribution of the response only through its mean, $\mathbf{\mu}$, which is
+
+|Model type|Abbr.|$\mathbf{\mu}$|Parameters estimated by|
+|----------|:-----:| :---------:  |:-----------------------|
+| Linear Model | LM | $\mathbf{\eta}$ | linear least squares (direct) |
+| Generalized Linear Model | GLM | $\mathbf{g}^{-1}(\mathbf{\eta})$ | iteratively reweighted least squares |
+| Nonlinear Regression Model | NLRM | $\mathbf{\mu}(\mathbf{\varphi})$ | nonlinear least squares |
+
+
+where $g^{-1}(\eta)$ is the inverse link function applied to the linear predictor component-wise.  (In Julia terminology, the scalar function is _broadcast_ over the $\eta$ vector to produce the $\mu$ vector.)  For the nonlinear regression model the mean function $\mu(\varphi)$ is a general  expression depending on parameters, $\varphi$, and on the covariates.
+
+For LMs and NLRs the distribution of $\mathcal{Y}$ is a _spherical Gaussian_ (or "normal") distribution, $\mathcal{N}(\mu,\sigma^2\mathbf{I})$.  (The parameter $\sigma$ is an example of a scale parameter - it simply expands or shrinks the distribution without otherwise changing it.)  The individual elements of $\mathcal{Y}$ are independent and have constant variance.  They differ only in the value of the mean for each element.
+
+In a GLM the distribution of the vector-valued response, $\mathcal{Y}$, is from a particular family, such as Bernoulli for a binary response or Poisson for count data.  The inverse link takes the linear predictor value, which is unbounded, to a constrained region in which the mean exists.  For example, the mean of a Bernoulli must be in $(0, 1)$ and the mean of a Poisson random variable must be positive.  Individual elements of $\mathcal{Y}$ are independent.  The distributions differ only in their means.  If there is a scale parameter in the distribution it is common to all elements.
+
+Columns of the model matrix $\mathbf{X}$ are generated from _terms_ in a model formula applied to the data table.  Categorical covariates in the data table can generate multiple columns in a single _term_.
+
+
+Statistical test of parameters are actually comparisons of different models fit to the same data. Nested linear models can be compared with an F-test.  For other models the more general (but less powerful and well-controlled) _likelihood ratio test_ is required.

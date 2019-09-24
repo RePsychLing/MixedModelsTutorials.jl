@@ -1,5 +1,7 @@
-
-# Linear Mixed Models
+---
+title: Linear mixed-effects models
+author: Douglas Bates
+---
 
 As described in the last section a _mixed-effects model_ or, more simply, a _mixed model_ incorporates both _fixed-effects_ parameters and _random effects_.  The random effects are associated with the levels of one or more _grouping factors_, which typically are _experimental units_ or _observational units_, such as `subject` or `item`. When we have several observations on each of several subjects, say, we may expect to see subject-to-subject variability in the response but assessing this variability is not the primary purpose of the data analysis.  Instead we wish to control for this level of variability in assessing difference in experimental factors.
 
@@ -30,9 +32,9 @@ A suitable model for these data would include an intercept and slope for the "ty
 Because $\Sigma$ is a covariance matrix it must be symmetric and be positive-definite, a condition that is similar to the requirement that a scalar variance must be positive.  In particular, a positive-definite matrix like $\Sigma$ has a "square root" in the sense that there is a matrix $\mathbf{L}$ such that $\Sigma=\mathbf{L}\mathbf{L}^\prime$.  (Multiplying by $\mathbf{L}^\prime$ instead of squaring $\mathbf{L}$ is necessary to ensure that the product is symmetric.)  In fact, there are several such matrices $\mathbf{L}$.  If we require that $\mathbf{L}$ is lower triangular and that its diagonal entries be positive, there is only one such matrix, which is called the lower (or left) Cholesky factor.
 
 As shown later, some of the expressions for the likelihood can be simplified if any scale parameter in the distribution of the response, given the random effects, is incorporated into the covariance matrix of the random effects.  We define $\mathbf{\lambda}$ to be the lower triangular matrix with non-negative diagonal entries such that
-\begin{equation}
+$$
 \Sigma=\sigma^2{\bf\lambda}{\bf\lambda}^\prime
-\end{equation}
+$$
 
 It helps to consider the example at this point to clarify these concepts.  Returning to the `sleepstudy` data shown above
 
@@ -94,13 +96,13 @@ b = vec(first(ranef(m1)))
 ```
 
 In the model the unconditional distribution of the random variable $\mathcal{B}$ is
-\begin{equation}
+$$
 \mathcal{B}\sim\mathcal{N}\left(\mathbf{0},\sigma^2\mathbf{\Lambda}\mathbf{\Lambda}^\prime\right)
-\end{equation}
+$$
 and the conditional distribution of the response vector, $\mathcal{Y}$, is
-\begin{equation}
+$$
 (\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim\mathcal{N}\left(\mathbf{X\beta}+\mathbf{Zb}, \sigma^2\mathbf{I}_n\right)
-\end{equation}
+$$
 
 The model matrix $\mathbf{X}$ for the fixed-effects has the usual form
 
@@ -127,29 +129,29 @@ but there is no need to actually construct $\mathbf{\Lambda}$.  It is completely
 ## Spherical random effects
 
 One of the many useful properties of the normal distribution is that a scalar normal distribution, $\mathcal{X}\sim\mathcal{N}(\mu,\sigma^2)$, can be expressed in terms of the _standard normal_ distribution, $\mathcal{Z}\sim\mathcal{N}(0,1)$ as
-\begin{equation}
+$$
 \mathcal{X} = \mu + \sigma \mathcal{Z}
-\end{equation}
+$$
 A similar result holds for the multivariate normal distribution.  The random effects vector, $\mathcal{B}$, with distribution $\mathcal{N}(\mathbf{0},\Sigma)$ can be generated from a "spherical" random effects vector, $\mathcal{U}$, as
-\begin{equation}
+$$
 \mathcal{B} = \Lambda \mathcal{U}\quad\mathrm{where}\quad\mathcal{U}\sim\mathcal{N}(\mathbf{0},\sigma^2\mathbf{I}_q)
-\end{equation}
+$$
 and $q$ is the dimension of the random-effects vector (36 in our example).
 
 (Recall that a multivariate normal distribution with covariance matrix $\sigma^2\mathbf{I}$ is called a "spherical normal" because the contours of constant probability density are spheres.  The random effects vector $\mathcal{U}$ has such a spherical distribution.)
 
 Now the conditional distribution of the response, given the random effects, can be written in terms of $\mathcal{U}$ as
-\begin{equation}
+$$
 (\mathcal{Y}|\mathcal{U}=\mathbf{u})\sim\mathcal{N}\left(\mathbf{X\beta}+\mathbf{Z\Lambda u}, \sigma^2\mathbf{I}_n\right)
-\end{equation}
+$$
 
 The joint probability density for $\mathcal{Y}$ and $\mathcal{U}$ is the product of the conditional density of $\mathcal{Y}|\mathcal{U}=\mathbf{u}$ and the unconditional density of $\mathcal{U}$.
-\begin{equation}
+$$
 \begin{aligned}
 f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})&= \frac{1}{(2\pi\sigma^2)^{n/2}}\exp\left(-\frac{\|\mathbf{y}-\mathbf{X\beta}-\mathbf{Z\Lambda u}\|^2}{2\sigma^2}\right)\,\frac{1}{(2\pi\sigma^2)^{q/2}}\exp\left(-\frac{\|\mathbf{u}\|^2}{2\sigma^2}\right)\\
 &=\frac{1}{(2\pi\sigma^2)^{(n+q)/2}}\exp\left(-\frac{\|\mathbf{y}-\mathbf{X\beta}-\mathbf{Z\Lambda u}\|^2+\|\mathbf{u}\|^2}{2\sigma^2}\right)
 \end{aligned}
-\end{equation}
+$$
 
 Evaluating the likelihood requires the marginal distribution of $\mathcal{Y}$.  This can be obtained by integrating the joint distribution, $f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})$, evaluated at the observed $\mathbf{y}$, with respect to $\mathbf{u}$. There is an analytic solution to this integral.  To derive this solution, we first write the penalized sum of squared residuals in a somewhat unusual but very useful form.  Let $\mathbf{\theta}$ be the vector of parameters that determine $\mathbf{\lambda}$.
 
@@ -168,7 +170,7 @@ m1.optsum
 It required fewer than 60 evaluations of the objective function to obtain the maximum likelihood estimates of $\mathbf{\theta}$ and, with them, the estimates of all the other parameters.
 
 To evaluate the log-likelihood we write the penalized sum of squared residuals in the joint density, $f_{\mathcal{Y},\mathcal{U}}(\mathbf{y,u})$, as
-\begin{equation}
+$$
 \begin{aligned}
 r^2_\mathbf{\theta}(\mathbf{u},\mathbf{\beta}) &=  \|\mathbf{y}-\mathbf{X\beta}-\mathbf{Z\Lambda_\theta u}\|^2+\|\mathbf{u}\|^2\\
 &=\left\|\begin{bmatrix}
@@ -205,34 +207,34 @@ r^2_\mathbf{\theta}(\mathbf{u},\mathbf{\beta}) &=  \|\mathbf{y}-\mathbf{X\beta}-
 &=\|\mathbf{r}_{Zy}-\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{R}_{ZZ}\mathbf{u}\|^2+ \|\mathbf{r}_{Xy}-\mathbf{R}_{XX}\mathbf{\beta}\|^2 + r_{yy}^2\\
 &=r_{yy}^2+\|\mathbf{R}_{XX}\mathbf{\beta}-\mathbf{r}_{Xy}\|^2+\|\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{r}_{Zy}\|^2
 \end{aligned}
-\end{equation}
+$$
 where
-\begin{equation}
+$$
 \mathbf{R}(\mathbf{\theta})=
 \begin{bmatrix}
 \mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy} \\
 \mathbf{0} & \mathbf{R}_{XX} & \mathbf{r}_{Xy} \\
 \mathbf{0} & \mathbf{0} & r_{yy}
 \end{bmatrix}
-\end{equation}
+$$
 is the upper triangular, right Cholesky factor of the symmetric, positive definite matrix
-\begin{equation}
+$$
 \begin{bmatrix}
 \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{Z\Lambda}+\mathbf{I} & \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{X} & \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{y} \\
 \mathbf{X}^\prime\mathbf{Z\Lambda} & \mathbf{X}^\prime\mathbf{X} & \mathbf{X}^\prime\mathbf{y} \\
 \mathbf{y}^\prime\mathbf{Z\Lambda} & \mathbf{y}^\prime\mathbf{X} & \mathbf{y}^\prime\mathbf{y}
 \end{bmatrix}
-\end{equation}
+$$
 The sub-matrices on the diagonal, $\mathbf{R}_{ZZ}$ and $\mathbf{R}_{XX}$, are upper triangular and $\mathbf{R}_{ZZ}$ is sparse.  In our example, $\mathbf{R}_{ZZ}$ is $36\times 36$ but the only non-zeros are the upper triangles of $18$ blocks of size $2\times 2$ along the diagonal.  Also, the diagonal elements are, by construction, positive.  Because $\mathbf{R}_{ZZ}$ is triangular its determinant, $|\mathbf{R}_{ZZ}|$, is the product of its diagonal elements which also must be positive.
 
 Furthermore, we can see that, for a fixed value of $\mathbf{\theta}$ the minimum $r^2_\mathbf{\theta}(\mathbf{u},\mathbf{\beta})$ is $r_{yy}^2$ and the conditional estimate of $\mathbf{\beta}$ satisfies
-\begin{equation}
+$$
 \mathbf{R}_{XX}\widehat{\mathbf{\beta}}(\mathbf{\theta})=\mathbf{r}_{Xy} .
-\end{equation}
+$$
 The conditional mode, $\tilde{\mathbf{u}}$, of $\mathcal{U}$ given $\mathcal{Y}=\mathbf{y}$ is the solution to
-\begin{equation}
+$$
 \mathbf{R}_{ZZ}\tilde{\mathbf{u}}=\mathbf{r}_{Zy}-\mathbf{R}_{ZX}\mathbf{\beta}
-\end{equation}
+$$
 Technically, $\mathbf{\beta}$ and $\mathbf{\theta}$ are assumed known because this is a statement about distributions.  In practice, the estimates, $\widehat{\mathbf{\theta}}$ and $\widehat{\beta}$, are plugged in.
 
 A Cholesky decomposition can be written in terms of the lower triangular factor on the left, $\mathbf{L}$, or in terms of $\mathbf{R}$ on the right.  There is a slight technical advantage in evaluating $\mathbf{L}$ in the `MixedModels` package so it is $\mathbf{L}$ that is evaluated and stored.  However, the theory is a bit easier to see in terms of $\mathbf{R}$, which we can obtain as
@@ -242,9 +244,9 @@ UpperTriangular(m1.L')
 ```
 
 To evaluate the likelihood,
-\begin{equation}
+$$
 L(\mathbf{\theta},\mathbf{\beta},\sigma|\mathbf{y}) = \int_\mathbf{u} f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})\, d\mathbf{u}
-\end{equation}
+$$
 we isolate the part of the joint density that depends on $\mathbf{u}$ and perform a change of variable to
 $$
 \mathbf{v}=\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{r}_{Zy} .
@@ -268,10 +270,10 @@ $$
 \widehat{\sigma^2}=\frac{r_{yy}^2}{n}
 $$
 which gives the _profiled log-likelihood_, $\ell(\mathbf{\theta}|\mathbf{y})=\log L(\mathbf{\theta},\widehat{\mathbf{\beta}},\widehat{\sigma})$ as
-\begin{equation}
+$$
 -2\ell(\mathbf{\theta}|\mathbf{y})=2\log(|\mathbf{R}_{ZZ}|) +
     n\left(1+\log\left(\frac{2\pi r_{yy}^2(\mathbf{\theta})}{n}\right)\right)
-\end{equation}
+$$
 
 This may seem complicated but, relative to other formulations of the model, it is remarkably simple.
 
@@ -395,3 +397,8 @@ print(xyplot(Reaction ~ Days | Subject, sleepstudy, aspect = "xy",
 ```
 
 shows that the fits for those subjects whose data shows a strong linear trend (e.g. 308, 309, 310, 337) are not changed that much.  But those whose data does not define a line well (e.g. 330, 331) are shrunk toward the global fit.
+
+```{julia;echo=false}
+using MixedModelsTutorials
+MixedModelsTutorials.tutorial_footer(WEAVE_ARGS[:folder],WEAVE_ARGS[:file])
+```

@@ -1,7 +1,9 @@
+---
+title: Statistical models using Julia
+author: Douglas Bates
+---
 
-# Statistical Models using Julia
-
-The purpose of this course is to describe some common families of statistical models and how they are related.
+The purpose of these tutorials is to describe some common families of statistical models and how they are related.
 
 These models are described in theory and illustrated in computational practice.  The [`Julia`](https://julialang.org) language and several Julia packages are used for the computing demonstrations because the code is in a style that is familiar to users of [`R`](https://r-project.org) or `Matlab/Octave` (and, to a lesser extent, [`Python`](https://python.org)) but it is self-contained, even for cutting-edge implementations.  Other high-level languages suffer from the "two-language" problem where the time-critical parts of the code must be written in a low-level language (e.g. `C/C++` or `Fortran`) to achieve acceptable performance on large data sets or complex models.
 
@@ -73,7 +75,7 @@ For the Bernoulli and Poisson distributions specifying the mean of the distribut
 
 ## Nonlinear regression
 
-A nonlinear regression model is essentially the same as a linear model except that the parameters, $\mathbf{\varphi}$, in the mean function do not need to appear as coefficients in a linear predictor.  The model incorporates a more general mean function, $\mu(\mathbf{c}, \varphi)$, where $\mathbf{c}$ denotes the covariate values for a particular observation.  For known values of the covariates we consider the mean function as depending only on the parameters, $\varphi$, and write 
+A nonlinear regression model is essentially the same as a linear model except that the parameters, $\mathbf{\varphi}$, in the mean function do not need to appear as coefficients in a linear predictor.  The model incorporates a more general mean function, $\mu(\mathbf{c}, \varphi)$, where $\mathbf{c}$ denotes the covariate values for a particular observation.  For known values of the covariates we consider the mean function as depending only on the parameters, $\varphi$, and write
 $$
 \mathcal{Y}\sim\mathcal{N}(\mathbf{\mu}(\mathbf{\varphi}), \sigma^2\mathbf{I}_n) .
 $$
@@ -206,11 +208,10 @@ m2 = fit(LinearModel, f2, Formaldehyde)
 ```
 
 The `abs2` function is a convenient way to write `carb * carb`.  The model matrix for `m2` is
-
 ```julia
-y, X2 = modelcols(apply_schema(f2, schema(Formaldehyde)), Formaldehyde); X2
+y, X2 = modelcols(apply_schema(f2, schema(Formaldehyde)), Formaldehyde)
+X2
 ```
-
 from which we can see that each element of the third column is the square of the corresponding element of the second column.  In other words, the `abs2` function is applied row-wise during the construction of the model matrix.
 
 Notice that, although this model fits `optden` as a quadratic function of `carb`, it is nonetheless a `LinearModel`.  Recall that the _linear_ in `LinearModel` refers to the linear predictor, $\mathbf{X}\mathbf{\beta}$.  In the quadratic model it is still the case that the predicted `optden` response is a linear function of the _parameters_, $\mathbf{\beta}$, which appear are the coefficients in the linear predictor.
@@ -363,17 +364,17 @@ Theoph = rcopy(R"Theoph")
 
 ```julia
 R"""
-(tpl <- ggplot(Theoph, aes(Time, conc)) + geom_point() + 
-    geom_line() + facet_wrap(~ Subject) + 
+(tpl <- ggplot(Theoph, aes(Time, conc)) + geom_point() +
+    geom_line() + facet_wrap(~ Subject) +
     xlab("Time since drug adminstration (hr)") +
     ylab("Serum concentration (mg/L)"))
 """
 ```
 
 The panels are arranged by increasing maximum concentration starting at the upper left and going across rows to the lower right.  A [pharmacokinetic](https://en.wikipedia.org/wiki/Pharmacokinetics) model for concentration in a single "compartment" after a single oral dose can be written in terms of an _elimination rate constant_, $k$, an _absorption rate constant_, $k_a$, and the effective _volume of distribution_, $V$, as
-\begin{equation}
+$$
 c(t) = \frac{\mathrm{dose}}{V} \frac{k_a - k}{k_a} \left(e^{-k\,t} - e^{-k_a\,t}\right)
-\end{equation}
+$$
 
 All three parameters - $k$, $k_a$, and $V$ - must be positive to be physically meaningful and, typically, their effect is more on a logarithmic scale.  Hence we write the model function in terms of parameters `lk`, `lka`, and `lV`, the logarithms of the parameters.  The parameters are passed to the model function as a `NamedTuple` which is a named collection of values, as is each row of data.
 
@@ -440,3 +441,8 @@ Columns of the model matrix $\mathbf{X}$ are generated from _terms_ in a model f
 
 
 Statistical test of parameters are actually comparisons of different models fit to the same data. Nested linear models can be compared with an F-test.  For other models the more general (but less powerful and well-controlled) _likelihood ratio test_ is required.
+
+```julia
+using MixedModelsTutorials
+MixedModelsTutorials.tutorial_footer(WEAVE_ARGS[:folder],WEAVE_ARGS[:file])
+```

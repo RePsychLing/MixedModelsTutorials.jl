@@ -1,6 +1,6 @@
 ---
-    title: Generalized linear mixed models
-    author: Douglas Bates, U of Wisconsin - Madison
+title: Generalized linear mixed models
+author: Douglas Bates, U. of Wisconsin - Madison
 ---
 
 ## Binary response data with random effects
@@ -319,4 +319,9 @@ plot(x=xvals,y=view(results, 1, :),Geom.line,Guide.xlabel("Scaled and shifted uâ
 ```
 ```{julia;echo=false;fig_cap="Function to be integrated with normalized Gauss-Hermite rule"}
 plot(x=xvals,y=view(results, 3, :),Geom.line,Guide.xlabel("Scaled and shifted uâ‚ƒ"),Guide.ylabel("Kernel ratio"))
+```
+
+```{julia;echo=false}
+using MixedModelsTutorials
+MixedModelsTutorials.tutorial_footer(WEAVE_ARGS[:folder],WEAVE_ARGS[:file])
 ```

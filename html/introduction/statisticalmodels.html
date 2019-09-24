@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<HTML lang = "en">
+<HEAD>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Statistical models using Julia</title>
+  
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: { equationNumbers: { autoNumber: "AMS" } }
+    });
+  </script>
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+<style>
+pre.hljl {
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 5px;
+    overflow-x: auto;
+    color: rgb(68,68,68); background-color: rgb(251,251,251); }
+pre.hljl > span.hljl-t { }
+pre.hljl > span.hljl-w { }
+pre.hljl > span.hljl-e { }
+pre.hljl > span.hljl-eB { }
+pre.hljl > span.hljl-o { }
+pre.hljl > span.hljl-k { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kc { color: rgb(59,151,46); font-style: italic; }
+pre.hljl > span.hljl-kd { color: rgb(214,102,97); font-style: italic; }
+pre.hljl > span.hljl-kn { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kp { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kr { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kt { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-n { }
+pre.hljl > span.hljl-na { }
+pre.hljl > span.hljl-nb { }
+pre.hljl > span.hljl-nbp { }
+pre.hljl > span.hljl-nc { }
+pre.hljl > span.hljl-ncB { }
+pre.hljl > span.hljl-nd { color: rgb(214,102,97); }
+pre.hljl > span.hljl-ne { }
+pre.hljl > span.hljl-neB { }
+pre.hljl > span.hljl-nf { color: rgb(66,102,213); }
+pre.hljl > span.hljl-nfm { color: rgb(66,102,213); }
+pre.hljl > span.hljl-np { }
+pre.hljl > span.hljl-nl { }
+pre.hljl > span.hljl-nn { }
+pre.hljl > span.hljl-no { }
+pre.hljl > span.hljl-nt { }
+pre.hljl > span.hljl-nv { }
+pre.hljl > span.hljl-nvc { }
+pre.hljl > span.hljl-nvg { }
+pre.hljl > span.hljl-nvi { }
+pre.hljl > span.hljl-nvm { }
+pre.hljl > span.hljl-l { }
+pre.hljl > span.hljl-ld { color: rgb(148,91,176); font-style: italic; }
+pre.hljl > span.hljl-s { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sa { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sb { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sc { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sd { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdC { color: rgb(201,61,57); }
+pre.hljl > span.hljl-se { color: rgb(59,151,46); }
+pre.hljl > span.hljl-sh { color: rgb(201,61,57); }
+pre.hljl > span.hljl-si { }
+pre.hljl > span.hljl-so { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sr { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ss { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ssB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-nB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nbB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nfB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nh { color: rgb(59,151,46); }
+pre.hljl > span.hljl-ni { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nil { color: rgb(59,151,46); }
+pre.hljl > span.hljl-noB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-oB { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-ow { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-p { }
+pre.hljl > span.hljl-c { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-ch { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cm { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cp { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cpB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cs { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-csB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-g { }
+pre.hljl > span.hljl-gd { }
+pre.hljl > span.hljl-ge { }
+pre.hljl > span.hljl-geB { }
+pre.hljl > span.hljl-gh { }
+pre.hljl > span.hljl-gi { }
+pre.hljl > span.hljl-go { }
+pre.hljl > span.hljl-gp { }
+pre.hljl > span.hljl-gs { }
+pre.hljl > span.hljl-gsB { }
+pre.hljl > span.hljl-gt { }
+</style>
+
+
+
+  <style type="text/css">
+  @font-face {
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 600;
+}
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+body {
+  margin: 0;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0; /* 1 */
+  padding: 0; /* 2 */
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+table {
+  font-family: monospace, monospace;
+  font-size : 0.8em;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+thead th {
+    border-bottom: 1px solid black;
+    background-color: white;
+}
+tr:nth-child(odd){
+  background-color: rgb(248,248,248);
+}
+
+
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/29/2014
+*/
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box; }
+@media (min-width: 400px) {
+  .container {
+    width: 85%;
+    padding: 0; }
+}
+@media (min-width: 550px) {
+  .container {
+    width: 80%; }
+  .column,
+  .columns {
+    margin-left: 4%; }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0; }
+
+  .one.column,
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
+
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
+
+  .one-half.column                { width: 48%; }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
+  .offset-by-two.column,
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
+  .offset-by-three.column,
+  .offset-by-three.columns        { margin-left: 26%;            }
+  .offset-by-four.column,
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
+  .offset-by-five.column,
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
+  .offset-by-six.column,
+  .offset-by-six.columns          { margin-left: 52%;            }
+  .offset-by-seven.column,
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
+  .offset-by-eight.column,
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
+  .offset-by-nine.column,
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
+  .offset-by-ten.column,
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns     { margin-left: 52%; }
+
+}
+html {
+  font-size: 62.5%; }
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222; }
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: 300; }
+h1 { font-size: 3.6rem; line-height: 1.2;  letter-spacing: -.1rem;}
+h2 { font-size: 3.4rem; line-height: 1.25; letter-spacing: -.1rem; }
+h3 { font-size: 3.2rem; line-height: 1.3;  letter-spacing: -.1rem; }
+h4 { font-size: 2.8rem; line-height: 1.35; letter-spacing: -.08rem; }
+h5 { font-size: 2.4rem; line-height: 1.5;  letter-spacing: -.05rem; }
+h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
+
+p {
+  margin-top: 0; }
+a {
+  color: #1EAEDB; }
+a:hover {
+  color: #0FA0CE; }
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  color: #333;
+  border-color: #888;
+  outline: 0; }
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  color: #FFF;
+  background-color: #33C3F0;
+  border-color: #33C3F0; }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  color: #FFF;
+  background-color: #1EAEDB;
+  border-color: #1EAEDB; }
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box; }
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; }
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid #33C3F0;
+  outline: 0; }
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600; }
+fieldset {
+  padding: 0;
+  border-width: 0; }
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline; }
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal; }
+ul {
+  list-style: circle; }
+ol {
+  list-style: decimal; }
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%; }
+li > p {margin : 0;}
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #E1E1E1; }
+th:first-child,
+td:first-child {
+  padding-left: 0; }
+th:last-child,
+td:last-child {
+  padding-right: 0; }
+button,
+.button {
+  margin-bottom: 1rem; }
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.5rem; }
+pre,
+blockquote,
+dl,
+figure,
+table,
+p,
+ul,
+ol,
+form {
+  margin-bottom: 1.0rem; }
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 1px solid #E1E1E1; }
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre.hljl {
+  margin: 0 0 10px;
+  display: block;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding : 5px;
+}
+
+pre.output {
+  background: #ffffff;
+}
+
+pre.code {
+  background: #ffffff;
+}
+
+pre.julia-error {
+  color : red
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+}
+
+
+@media (min-width: 400px) {}
+@media (min-width: 550px) {}
+@media (min-width: 750px) {}
+@media (min-width: 1000px) {}
+@media (min-width: 1200px) {}
+
+h1.title {margin-top : 20px}
+img {max-width : 100%}
+div.title {text-align: center;}
+
+  </style>
+
+
+
+</HEAD>
+  <BODY>
+    <div class ="container">
+      <div class = "row">
+        <div class = "col-md-12 twelve columns">
+
+          <div class="title">
+            <h1 class="title">Statistical models using Julia</h1>
+            <h5>Douglas Bates</h5>
+            
+          </div>
+
+          <p>The purpose of these tutorials is to describe some common families of statistical models and how they are related.</p>
+<p>These models are described in theory and illustrated in computational practice.  The <a href="https://julialang.org"><code>Julia</code></a> language and several Julia packages are used for the computing demonstrations because the code is in a style that is familiar to users of <a href="https://r-project.org"><code>R</code></a> or <code>Matlab/Octave</code> &#40;and, to a lesser extent, <a href="https://python.org"><code>Python</code></a>&#41; but it is self-contained, even for cutting-edge implementations.  Other high-level languages suffer from the &quot;two-language&quot; problem where the time-critical parts of the code must be written in a low-level language &#40;e.g. <code>C/C&#43;&#43;</code> or <code>Fortran</code>&#41; to achieve acceptable performance on large data sets or complex models.</p>
+<h2>Overview</h2>
+<p>The statistical models to be considered assume that the observed data can be represented as a <em>data table</em> where the columns correspond to variables and the rows to instances.  One of the columns is the <em>response variable</em>.  The others are <em>covariates</em>.  Rows of the columns are <em>instances</em>.  The underlying assumption is that the response is the observed value of a random variable whose mean is a function of the covariate values for that instance.  This <em>mean function</em> also depends on <em>parameters</em> to be estimated.</p>
+<p>If, after data cleaning, the data table has <span class="math">$n$</span> rows then <span class="math">$\mathbf{y}$</span> is the <span class="math">$n$</span>-dimensional observed response and <span class="math">$\mathcal{Y}$</span> is the corresponding <span class="math">$n$</span>-dimensional random variable describing the probability model.  For <em>linear</em> and <em>generalized linear</em> models the mean function <span class="math">$\mu$</span> is related to the covariates by a <em>linear predictor expression</em> of the form</p>
+<p class="math">\[
+\mathbf{\eta}=\mathbf{X}\mathbf{\beta}
+\]</p>
+<p>where <span class="math">$\mathbf{X}$</span> is an <span class="math">$n\times p$</span> <em>model matrix</em> and <span class="math">$\mathbf{\beta}$</span> is a <span class="math">$p$</span>-dimensional <em>coefficient vector</em>.</p>
+<p>For a <em>nonlinear regression</em> model the mean function is an expression that depends on a parameter vector, <span class="math">$\mathbf{\varphi}$</span>, and the observed values of the covariates.</p>
+<p>The covariates can be on a continuous scale such as <em>age</em>, <em>dose</em>, <em>concentration</em>, etc. or <em>categorical</em> such as <em>sex</em>, <em>treatment</em> &#40;as in treatment vs control&#41;, <em>subject</em> or <em>item</em>.  The levels of a categorical covariate can be fixed, e.g. <em>sex</em> may be recorded as &quot;F&quot; or &quot;M&quot;, or they can represent a sample from a population.  Usually <em>subject</em> is a categorical covariate whose levels are a sample from a population.  If the levels of the covariate are fixed and reproducible we model the <em>effect</em> of changing from one level to another in the coefficient vector, <span class="math">$\mathbf{\beta}$</span>, or in the parameters, <span class="math">$\mathbf{\varphi}$</span>, of a nonlinear model.  The parameters involved as described as <em>fixed-effects</em>.  When the levels represent a sample from a population they can be incorporated as <em>random effects</em>, which is another level of variability in the response.  The modeling goal is to assess the variability of these random effects.</p>
+<p>A model with fixed-effects parameters and random effects is called a <em>mixed-effects model</em> or, more simply, a <em>mixed model</em>.</p>
+<p>We now introduce the formulation of specific model types.</p>
+<h3>Linear Model</h3>
+<p>The probability model can be succinctly described as</p>
+<p class="math">\[
+\mathcal{Y}\sim\mathcal{N}(\mathbf{X}\mathbf{\beta},\sigma^2\mathbf{I}_n)
+\]</p>
+<p>where <span class="math">$\mathcal{N}$</span> denotes the multivariate normal &#40;also called Gaussian&#41; distribution, <span class="math">$\mathbf{I}_n$</span> is the <span class="math">$n\times n$</span> identity matrix, and <span class="math">$\sigma$</span> is a <em>scale parameter</em>.</p>
+<p>This model encompasses <em>simple linear regression</em>, <em>multiple linear regression</em>, <em>polynomial regression</em> plus <em>analysis of variance</em> models of many sorts.  The various flavors of these models depend on the construction of the model matrix, <span class="math">$\mathbf{X}$</span>, from the data table and on the resultant interpretation of elements of the coefficient vector, <span class="math">$\mathbf{\beta}$</span>, as shown later in the examples.</p>
+<h3>Generalized Linear Model</h3>
+<p>In the case of a binary &#40;Yes/No, Success/Failure, etc.&#41; response we model the distribution of <span class="math">$\mathcal{Y}$</span> as a multivariate Bernoulli distribution, again assuming independence between elements.  &#40;This is like saying the covariance of the multivariate Normal in linear models is a multiple of <span class="math">$\mathbf{I}_n$</span>.&#41;  However, the mean for each observation, which is the probability of &quot;success&quot; must be in the interval <span class="math">$(0,1)$</span>. It is necessary to transform the linear predictor value, which is on an unbounded scale, <span class="math">$(-\infty,\infty)$</span>, onto the restricted range.  The transformation back and forth from the linear predictor, <span class="math">$\eta$</span>, scale to the mean, <span class="math">$\mu$</span>, scale is called the <em>link function</em>.  For historical reasons the <em>link</em>, <span class="math">$g$</span>, is defined to be the function that maps the mean to the linear predictor.  That is</p>
+<p class="math">\[
+\eta = g(\mu)
+\]</p>
+<p>and the <em>inverse link</em>, <span class="math">$g^{-1}$</span>, maps the linear predictor to the mean.</p>
+<p>A <em>generalized linear model</em> is defined by the distribution, <span class="math">$\mathcal{D}$</span> &#40;<a href="https://en.wikipedia.org/wiki/Bernoulli_distribution">Bernoulli</a> in the case described above&#41; and the link, <span class="math">$g$</span>.  Although there are many possible functions that could be used as a link, the form of the probability mass function &#40;or the probability density function&#41; for distributions in the <a href="https://en.wikipedia.org/wiki/Exponential_family">exponential family</a> defines a <em>canonical link</em>.  In the case of the Bernoulli the canonical link is the <a href="https://en.wikipedia.org/wiki/Logit">logit</a> or <em>log-odds</em> function</p>
+<p class="math">\[
+\eta = g^{-1}(\mu)=\log\left(\frac{\mu}{1-\mu}\right)
+\]</p>
+<p>&#40;Recall that for the Bernoulli the mean, <span class="math">$\mu$</span> is the probability of success, <span class="math">$p$</span> so <span class="math">$p/(1-p)$</span> is the odds ratio - hence the name <em>log-odds</em>.&#41;</p>
+<p>The inverse link is the <a href="https://en.wikipedia.org/wiki/Logistic_function">logistic</a> function</p>
+<p class="math">\[
+\mu = g(\eta) = \frac{1}{1 + \exp(-\eta)} .
+\]</p>
+<p>A generalized linear model with a Bernoulli distribution and the logit link is sometimes called a <em>logistic regression model</em>.</p>
+<p>For the Poisson distribution, where the mean must be positive, the canonical link is the <em>log-link</em>.  That is</p>
+<p class="math">\[
+\eta=g(\mu)=\log(\mu)
+\]</p>
+<p>and the inverse link is the exponential</p>
+<p class="math">\[
+\mu = g^{-1}(\eta) = \exp(\eta) .
+\]</p>
+<p>A generalized linear model &#40;GLM&#41; can be written</p>
+<p class="math">\[
+\mathcal{Y}\sim\mathcal{D}\left(\mathbf{g}^{-1}(\mathbf{X}\mathbf{\beta})\right)
+\]</p>
+<p>where <span class="math">$\mathbf{g}^{-1}$</span> indicates applying the scalar inverse-link function, <span class="math">$g^{-1}$</span>, to each element, <span class="math">$\eta_i, i=1,\dots,n$</span>, of the linear predictor to produce the corresponding element, <span class="math">$\mu_i$</span>, of the mean.</p>
+<p>For the Bernoulli and Poisson distributions specifying the mean of the distribution completely determines it.  Other distributions may incorporate a scale parameter like <span class="math">$\sigma$</span> in the normal distribution.  In those cases the scale parameter is common to all the observations.</p>
+<h2>Nonlinear regression</h2>
+<p>A nonlinear regression model is essentially the same as a linear model except that the parameters, <span class="math">$\mathbf{\varphi}$</span>, in the mean function do not need to appear as coefficients in a linear predictor.  The model incorporates a more general mean function, <span class="math">$\mu(\mathbf{c}, \varphi)$</span>, where <span class="math">$\mathbf{c}$</span> denotes the covariate values for a particular observation.  For known values of the covariates we consider the mean function as depending only on the parameters, <span class="math">$\varphi$</span>, and write</p>
+<p class="math">\[
+\mathcal{Y}\sim\mathcal{N}(\mathbf{\mu}(\mathbf{\varphi}), \sigma^2\mathbf{I}_n) .
+\]</p>
+<p>Each of these model types has a corresponding mixed-effects form but we will defer that discussion until later.  At this point some examples are needed &#40;unless you really like looking at pages of formulas&#41;.</p>
+<h2>Examples</h2>
+<p>The first task is to load some data sets into Julia to illustrate the steps in defining and fitting models as described above.  For this we will use several Julia packages.  A package is loaded in a Julia session with the <code>using</code> directive.  There are several packages in a standard library available in any Julia installation.  We will use the <code>LinearAlgebra</code>, <code>Random</code> and <code>Statistics</code> packages from the standard library.  In addition, however, we will use several contributed packages that need to be added to the local package collection before they can be used.</p>
+<p>Registered Julia packages are described at https://pkg.julialang.org. &#40;The order in which the packages are displayed is according to popularity as measured by github stars.  Notice the search panel on the upper left to allow searching by name.  A panel below the search panel allows for filtering packages by github tag.&#41;</p>
+<p>Some of the packages we will use are:</p>
+<ul>
+<li><p><code>DataFrames</code>: a common column-oriented data table representation</p>
+</li>
+<li><p><code>Distributions</code>: probability distribution types and associated functions</p>
+</li>
+<li><p><code>GLM</code>: fit and examine linear and generalized linear models</p>
+</li>
+<li><p><code>MixedModels</code>: fit and examine linear mixed models and generalized linear mixed models</p>
+</li>
+<li><p><code>NLreg</code>: nonlinear regression</p>
+</li>
+<li><p><code>RCall</code>: access data and functions in <code>R</code> from Julia</p>
+</li>
+<li><p><code>StatsModels</code>: Create model matrices from a formula/data representation</p>
+</li>
+<li><p><code>Tables</code>: transform tabular data from column-oriented &#40;an ordered collection of named columns&#41; to row-oriented &#40;a vector of named <em>Tuples</em>&#41; or vice-versa</p>
+</li>
+</ul>
+<p>Each package will need to be added to the local collection but this only needs to be done once, although there is no harm in calling <code>Pkg.add</code> on a package that is already available.</p>
+<p>By the way, if you don&#39;t believe that Julia addresses the <em>2-language problem</em>, look at the Github repositories for these packages.  Even very complicated packages like <code>CSV</code> are written entirely in Julia. There is no need to compile performance-critical code in, say, <code>C&#43;&#43;</code>. &#40;And, if you don&#39;t believe that <code>CSV</code> is complicated, you haven&#39;t tried to write a package that will read CSV or other &quot;simple&quot; formats like tab-separated, allowing for the endlessly creative conventions that people come up with to code missing data or logical values or dates or variations on decimal separators or ...&#41;</p>
+<h3>A simple linear regression</h3>
+<p>Consider a simple data set from a calibration experiment in which optical density of a solution is measured as a function of carbohydrate concentration.  These data are available in the R <code>datasets</code> package, which can be accessed using <code>RCall</code>. First load the required Julia packages.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>DataFrames</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Distributions</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>GLM</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>NLreg</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>RCall</span><span class='hljl-t'>
+</span><span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>Statistics</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>StatsBase</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>StatsModels</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tables</span>
+</pre>
+
+
+
+<p>and the data table</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Formaldehyde</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rcopy</span><span class='hljl-p'>(</span><span class='hljl-so'>R&quot;Formaldehyde&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>carb</th><th>optden</th></tr><tr><th></th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>6 rows × 2 columns</p><tr><th>1</th><td>0.1</td><td>0.086</td></tr><tr><th>2</th><td>0.3</td><td>0.269</td></tr><tr><th>3</th><td>0.5</td><td>0.446</td></tr><tr><th>4</th><td>0.6</td><td>0.538</td></tr><tr><th>5</th><td>0.7</td><td>0.626</td></tr><tr><th>6</th><td>0.9</td><td>0.782</td></tr></tbody></table>
+
+<p>Because of Julia&#39;s JIT &#40;Just-In-Time&#41; compiler the first use of a function like <code>rcopy</code> can take longer than expected because that function and many others must be compiled.  Subsequent uses are much faster.</p>
+<p>We have a data table stored as a <code>DataFrame</code>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>typeof</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+DataFrames.DataFrame
+</pre>
+
+
+<p>We see from the printed display of the table that the columns are named <code>carb</code> and <code>optden</code> and both contain <code>Float64</code> values &#40;i.e. double-precision floating point values&#41;.  Individual columns can be extracted as vectors by name using the <code>.</code> operator.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Formaldehyde</span><span class='hljl-oB'>.</span><span class='hljl-n'>carb</span>
+</pre>
+
+
+<pre class="output">
+6-element Array&#123;Float64,1&#125;:
+ 0.1
+ 0.3
+ 0.5
+ 0.6
+ 0.7
+ 0.9
+</pre>
+
+
+<p>Columns are considered to be &quot;properties&quot; of the data frame</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>propertynames</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Symbol,1&#125;:
+ :carb  
+ :optden
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>getproperty</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:optden</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+6-element Array&#123;Float64,1&#125;:
+ 0.086
+ 0.269
+ 0.446
+ 0.538
+ 0.626
+ 0.782
+</pre>
+
+
+<p>As indicated in the <code>propertynames</code> output, the names are of type <code>Symbol</code> which, when typed explicitly, has a leading <code>:</code>.</p>
+<p>When there are many rows or many columns in a <code>DataFrame</code> the printed display will be truncated.  For large tables the <code>describe</code> function provides a statistical summary of each column.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>DataFrames</span><span class='hljl-oB'>.</span><span class='hljl-nf'>describe</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nunique</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th>Symbol</th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th><th>Nothing</th><th>Nothing</th><th>DataType</th></tr></thead><tbody><p>2 rows × 8 columns</p><tr><th>1</th><td>carb</td><td>0.516667</td><td>0.1</td><td>0.55</td><td>0.9</td><td></td><td></td><td>Float64</td></tr><tr><th>2</th><td>optden</td><td>0.457833</td><td>0.086</td><td>0.492</td><td>0.782</td><td></td><td></td><td>Float64</td></tr></tbody></table>
+
+<p>A plot of these data</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+suppressPackageStartupMessages(library(ggplot2))
+(p &lt;- ggplot(Formaldehyde, aes(carb, optden)) + geom_point() +
+      xlab(&quot;Carbohydrate concentration&quot;) + ylab(&quot;Optical Density&quot;))
+&quot;&quot;&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>indicates a strong linear relationship between the optical density and the carbohydrate concentration, as one would wish for linear calibration.</p>
+<p>A linear model, as implemented in the <code>GLM</code> package, can be used to fit such a linear relationship.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-p'>(</span><span class='hljl-n'>optden</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>carb</span><span class='hljl-p'>);</span><span class='hljl-t'>
+</span><span class='hljl-n'>m1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>LinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.LinearModel&#123;GLM.LmResp&#123;Array&#123;Float64,1
+&#125;&#125;,GLM.DensePredChol&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2
+&#125;&#125;&#125;&#125;,Array&#123;Float64,2&#125;&#125;
+
+optden ~ 1 &#43; carb
+
+Coefficients:
+───────────────────────────────────────────────────────────────────────────
+────
+               Estimate  Std. Error    t value  Pr&#40;&gt;|t|&#41;   Lower 95&#37;  Upper
+ 95&#37;
+───────────────────────────────────────────────────────────────────────────
+────
+&#40;Intercept&#41;  0.00508571  0.00783368   0.649211    0.5516  -0.0166641  0.026
+8355
+carb         0.876286    0.0135345   64.7444      &lt;1e-6    0.838708   0.913
+864 
+───────────────────────────────────────────────────────────────────────────
+────
+</pre>
+
+
+<p>The formula, <code>optden ~ 1 &#43; carb</code>, describes how the model matrix and the response vector are to be created from the data table.  The table <em>schema</em> &#40;names and types of columns&#41; is applied to the formula then the model columns are created.  &#40;The syntax <code>@formula&#40;...&#41;</code> is a call to a <em>macro</em>, rather than a function.  The formula language is an example of a Domain Specific Language &#40;DSL&#41; that must be implemented as macros to change the meaning of the syntax. The details aren&#39;t important here.&#41;</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>y</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>X1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>modelcols</span><span class='hljl-p'>(</span><span class='hljl-nf'>apply_schema</span><span class='hljl-p'>(</span><span class='hljl-n'>f1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>schema</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)),</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>);</span><span class='hljl-t'>
+</span><span class='hljl-n'>X1</span>
+</pre>
+
+
+<pre class="output">
+6×2 Array&#123;Float64,2&#125;:
+ 1.0  0.1
+ 1.0  0.3
+ 1.0  0.5
+ 1.0  0.6
+ 1.0  0.7
+ 1.0  0.9
+</pre>
+
+
+<p>In the formula, the tilde &#40;<code>~</code>&#41; character is read as &quot;is modeled by&quot; and the <code>1</code> indicates an &quot;intercept&quot; term.  At this point we may be content with a very good fit as measured, say, by the <em>multiple correlation coefficient</em>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>r²</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span><span class='hljl-t'>   </span><span class='hljl-cs'># to type the superscript 2 type \^2&lt;tab&gt; or use the name r2</span>
+</pre>
+
+
+<pre class="output">
+0.9990466748057584
+</pre>
+
+
+<p>but a plot of the residuals versus the fitted values reveals some curvature.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+qplot(x=$(predict(m1)), y=$(residuals(m1)), geom=&quot;point&quot;,
+      ylab=&quot;Residuals&quot;, xlab=&quot;Fitted values&quot;)
+&quot;&quot;&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>To some extent the curvature can also be seen in the data plot with the fitted line superimposed.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;p + geom_abline(intercept=$(coef(m1)[1]), slope=$(coef(m1)[2]))&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>indicates some curvature in the relationship.  It may be worthwhile fitting a quadratic relationship.</p>
+<h2>Fitting optden as a quadratic function of carb</h2>
+<p>To fit a quadratic relationship we simple modify the formula</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f2</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-p'>(</span><span class='hljl-n'>optden</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>carb</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-nf'>abs2</span><span class='hljl-p'>(</span><span class='hljl-n'>carb</span><span class='hljl-p'>))</span><span class='hljl-t'>
+</span><span class='hljl-n'>m2</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>LinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.LinearModel&#123;GLM.LmResp&#123;Array&#123;Float64,1
+&#125;&#125;,GLM.DensePredChol&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2
+&#125;&#125;&#125;&#125;,Array&#123;Float64,2&#125;&#125;
+
+optden ~ 1 &#43; carb &#43; :&#40;abs2&#40;carb&#41;&#41;
+
+Coefficients:
+───────────────────────────────────────────────────────────────────────────
+────
+               Estimate  Std. Error   t value  Pr&#40;&gt;|t|&#41;  Lower 95&#37;    Upper
+ 95&#37;
+───────────────────────────────────────────────────────────────────────────
+────
+&#40;Intercept&#41;  -0.0116827  0.00600145  -1.94664    0.1468  -0.030782   0.0074
+1662
+carb          0.971123   0.0267825   36.2596     &lt;1e-4    0.885889   1.0563
+6   
+abs2&#40;carb&#41;   -0.0962121  0.0263094   -3.65694    0.0353  -0.179941  -0.0124
+837 
+───────────────────────────────────────────────────────────────────────────
+────
+</pre>
+
+
+<p>The <code>abs2</code> function is a convenient way to write <code>carb * carb</code>.  The model matrix for <code>m2</code> is</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>y</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>X2</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>modelcols</span><span class='hljl-p'>(</span><span class='hljl-nf'>apply_schema</span><span class='hljl-p'>(</span><span class='hljl-n'>f2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>schema</span><span class='hljl-p'>(</span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)),</span><span class='hljl-t'> </span><span class='hljl-n'>Formaldehyde</span><span class='hljl-p'>)</span><span class='hljl-t'>
+</span><span class='hljl-n'>X2</span>
+</pre>
+
+
+<pre class="output">
+6×3 Array&#123;Float64,2&#125;:
+ 1.0  0.1  0.01
+ 1.0  0.3  0.09
+ 1.0  0.5  0.25
+ 1.0  0.6  0.36
+ 1.0  0.7  0.49
+ 1.0  0.9  0.81
+</pre>
+
+
+<p>from which we can see that each element of the third column is the square of the corresponding element of the second column.  In other words, the <code>abs2</code> function is applied row-wise during the construction of the model matrix.</p>
+<p>Notice that, although this model fits <code>optden</code> as a quadratic function of <code>carb</code>, it is nonetheless a <code>LinearModel</code>.  Recall that the <em>linear</em> in <code>LinearModel</code> refers to the linear predictor, <span class="math">$\mathbf{X}\mathbf{\beta}$</span>.  In the quadratic model it is still the case that the predicted <code>optden</code> response is a linear function of the <em>parameters</em>, <span class="math">$\mathbf{\beta}$</span>, which appear are the coefficients in the linear predictor.</p>
+<p>When several models have been fit to the same data set it is natural to consider which one is to be preferred.  Model <code>m1</code> is a special case of model <code>m2</code>.  Any model that can be expressed as an intercept plus a multiple of <code>carb</code> can also be expressed in the form of <code>m2</code> by simply setting the third coefficient to zero.  The set of all possible fitted values from <code>m1</code> is a subset of those from <code>m2</code>.</p>
+<p>&#40;For those who know the terminology, the set of vectors of the form <span class="math">$\mathbf{\eta}=\mathbf{X}\mathbf{\beta}, \forall\mathbf{\beta}$</span> is called the <em>column span</em> of <span class="math">$\mathbf{X}$</span> and these vectors form a <em>linear subspace</em> of the vector space of possible response vectors <span class="math">$\mathbf{y}$</span>.  The dimension of the column span, also called the <em>degrees of freedom</em> of the column span, is the number of linearly independent columns of <span class="math">$\mathbf{X}$</span>.  Model <code>m1</code> is contained in model <code>m2</code> in the sense that the column span of <code>X1</code> is a linear subspace of the column span of <code>X2</code>.&#41;</p>
+<p>The models have been fit by minimizing the sum of squared residuals, <span class="math">$\|\mathbf{y} - \mathbf{X}\mathbf{\beta}\|^2$</span>.  Because model <code>m1</code> is contained in model <code>m2</code>, its sum of squared residuals must be at least as large as that of <code>m2</code>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>rss1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>sum</span><span class='hljl-p'>(</span><span class='hljl-n'>abs2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>residuals</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+0.0002992000000000023
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>rss2</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>sum</span><span class='hljl-p'>(</span><span class='hljl-n'>abs2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>residuals</span><span class='hljl-p'>(</span><span class='hljl-n'>m2</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+5.482121212121217e-5
+</pre>
+
+
+<p>The better fit from <code>m2</code> comes at a cost of 1 additional coefficient.  For nested linear models such as these an <em>F-test</em> &#40;named after <a href="https://en.wikipedia.org/wiki/Ronald_Fisher">Sir Ronald Fisher</a>&#41; provides a comparison of the two models.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>ftest</span><span class='hljl-p'>(</span><span class='hljl-n'>m2</span><span class='hljl-oB'>.</span><span class='hljl-n'>model</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>model</span><span class='hljl-p'>)</span><span class='hljl-t'>   </span><span class='hljl-cs'># add a delegate method to StatsModels</span>
+</pre>
+
+
+<pre class="output">
+Res. DOF DOF ΔDOF    SSR    ΔSSR     R²    ΔR²      F*  p&#40;&gt;F&#41;
+Model 1        3   4      0.0001         0.9998                      
+Model 2        4   3   -1 0.0003 -0.0002 0.9990 0.0008 13.3732 0.0353
+</pre>
+
+
+<p>The <em>p-value</em> of 3.5&#37; in the last column is generally considered to indicate that the fit of the quadratic model is &quot;significantly better&quot; than the fit of the simple linear model.  Technically this value is the probability of getting the results that we did or other results even more extremely in favor of the alternative &#40;quadratic&#41; model if these data had indeed been generated from the simple linear model.</p>
+<p>This <em>p-value</em> is the same as that for the <code>abs2&#40;carb&#41;</code> coefficient in the coefficient summary table for the quadratic model. In fact, the two tests are equivalent. In the early days of computing, when fitting even the simplest model was excedingly difficult, it seemed reasonable to evaluate all the possible hypothese tests or measures of goodness of fit once the model had been fit.  Unfortunately, the practice of liberally sprinkling p-values throughout summaries of models has led to many misconceptions about their interpretation.  In some ways every F-test or t-test is a comparison of the fit of a restricted model &#40;the <em>null</em> model&#41; to the fit of a more general, <em>alternative</em> model.  One doesn&#39;t test coefficients per se - these tests are a comparison of nested models &#40;in the sense described above, the null model is a special case of the alternative model&#41;. Without being able describe the two models being compared, it seems likely that the results of the test can be misinterpreted.</p>
+<h2>Categorical covariates</h2>
+<p>On some occasions we wish to incorporate categorical covariates, such as the treatment used in an experiment or demographic characteristics of experimental subjects, into the model.  For example, the <code>InsectSprays</code> dataset provides the counts of insects in an experiment where different insecticides were used.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>InsectSprays</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rcopy</span><span class='hljl-p'>(</span><span class='hljl-so'>R&quot;datasets::InsectSprays&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>count</th><th>spray</th></tr><tr><th></th><th>Float64</th><th>Categorical…</th></tr></thead><tbody><p>72 rows × 2 columns</p><tr><th>1</th><td>10.0</td><td>A</td></tr><tr><th>2</th><td>7.0</td><td>A</td></tr><tr><th>3</th><td>20.0</td><td>A</td></tr><tr><th>4</th><td>14.0</td><td>A</td></tr><tr><th>5</th><td>14.0</td><td>A</td></tr><tr><th>6</th><td>12.0</td><td>A</td></tr><tr><th>7</th><td>10.0</td><td>A</td></tr><tr><th>8</th><td>23.0</td><td>A</td></tr><tr><th>9</th><td>17.0</td><td>A</td></tr><tr><th>10</th><td>20.0</td><td>A</td></tr><tr><th>11</th><td>14.0</td><td>A</td></tr><tr><th>12</th><td>13.0</td><td>A</td></tr><tr><th>13</th><td>11.0</td><td>B</td></tr><tr><th>14</th><td>17.0</td><td>B</td></tr><tr><th>15</th><td>21.0</td><td>B</td></tr><tr><th>16</th><td>11.0</td><td>B</td></tr><tr><th>17</th><td>16.0</td><td>B</td></tr><tr><th>18</th><td>14.0</td><td>B</td></tr><tr><th>19</th><td>17.0</td><td>B</td></tr><tr><th>20</th><td>17.0</td><td>B</td></tr><tr><th>21</th><td>19.0</td><td>B</td></tr><tr><th>22</th><td>21.0</td><td>B</td></tr><tr><th>23</th><td>7.0</td><td>B</td></tr><tr><th>24</th><td>13.0</td><td>B</td></tr><tr><th>25</th><td>0.0</td><td>C</td></tr><tr><th>26</th><td>1.0</td><td>C</td></tr><tr><th>27</th><td>7.0</td><td>C</td></tr><tr><th>28</th><td>2.0</td><td>C</td></tr><tr><th>29</th><td>3.0</td><td>C</td></tr><tr><th>30</th><td>1.0</td><td>C</td></tr><tr><th>31</th><td>2.0</td><td>C</td></tr><tr><th>32</th><td>1.0</td><td>C</td></tr><tr><th>33</th><td>3.0</td><td>C</td></tr><tr><th>34</th><td>0.0</td><td>C</td></tr><tr><th>35</th><td>1.0</td><td>C</td></tr><tr><th>36</th><td>4.0</td><td>C</td></tr><tr><th>37</th><td>3.0</td><td>D</td></tr><tr><th>38</th><td>5.0</td><td>D</td></tr><tr><th>39</th><td>12.0</td><td>D</td></tr><tr><th>40</th><td>6.0</td><td>D</td></tr><tr><th>41</th><td>4.0</td><td>D</td></tr><tr><th>42</th><td>3.0</td><td>D</td></tr><tr><th>43</th><td>5.0</td><td>D</td></tr><tr><th>44</th><td>5.0</td><td>D</td></tr><tr><th>45</th><td>5.0</td><td>D</td></tr><tr><th>46</th><td>5.0</td><td>D</td></tr><tr><th>47</th><td>2.0</td><td>D</td></tr><tr><th>48</th><td>4.0</td><td>D</td></tr><tr><th>49</th><td>3.0</td><td>E</td></tr><tr><th>50</th><td>5.0</td><td>E</td></tr><tr><th>51</th><td>3.0</td><td>E</td></tr><tr><th>52</th><td>5.0</td><td>E</td></tr><tr><th>53</th><td>3.0</td><td>E</td></tr><tr><th>54</th><td>6.0</td><td>E</td></tr><tr><th>55</th><td>1.0</td><td>E</td></tr><tr><th>56</th><td>1.0</td><td>E</td></tr><tr><th>57</th><td>3.0</td><td>E</td></tr><tr><th>58</th><td>2.0</td><td>E</td></tr><tr><th>59</th><td>6.0</td><td>E</td></tr><tr><th>60</th><td>4.0</td><td>E</td></tr><tr><th>61</th><td>11.0</td><td>F</td></tr><tr><th>62</th><td>9.0</td><td>F</td></tr><tr><th>63</th><td>15.0</td><td>F</td></tr><tr><th>64</th><td>22.0</td><td>F</td></tr><tr><th>65</th><td>15.0</td><td>F</td></tr><tr><th>66</th><td>16.0</td><td>F</td></tr><tr><th>67</th><td>13.0</td><td>F</td></tr><tr><th>68</th><td>10.0</td><td>F</td></tr><tr><th>69</th><td>26.0</td><td>F</td></tr><tr><th>70</th><td>26.0</td><td>F</td></tr><tr><th>71</th><td>24.0</td><td>F</td></tr><tr><th>72</th><td>13.0</td><td>F</td></tr></tbody></table>
+
+<p>Plotting the data shows that, as often occurs, there is much greater variability in the larger counts than in the smaller counts.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+(p2 &lt;- ggplot(InsectSprays, aes(spray, count)) + geom_violin() +
+       geom_point() + xlab(&quot;Spray&quot;) +
+       ylab(&quot;Count of insects in a standard area&quot;) + coord_flip())
+&quot;&quot;&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>One way of adjusting for the changing variability is to model the square root of the counts instead of the counts themselves.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;p2 + scale_y_sqrt()&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>When a categorical covariate, such as <code>Spray</code>, is included in a model, the model matrix gets several columns associated with that one term.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f3</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-t'> </span><span class='hljl-nf'>sqrt</span><span class='hljl-p'>(</span><span class='hljl-n'>count</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>spray</span><span class='hljl-p'>;</span><span class='hljl-t'>
+</span><span class='hljl-n'>m3</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>LinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f3</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>InsectSprays</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.LinearModel&#123;GLM.LmResp&#123;Array&#123;Float64,1
+&#125;&#125;,GLM.DensePredChol&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2
+&#125;&#125;&#125;&#125;,Array&#123;Float64,2&#125;&#125;
+
+:&#40;sqrt&#40;count&#41;&#41; ~ 1 &#43; spray
+
+Coefficients:
+───────────────────────────────────────────────────────────────────────────
+──
+              Estimate  Std. Error    t value  Pr&#40;&gt;|t|&#41;  Lower 95&#37;  Upper 9
+5&#37;
+───────────────────────────────────────────────────────────────────────────
+──
+&#40;Intercept&#41;   3.76068     0.181388  20.7328      &lt;1e-29   3.39853    4.1228
+3 
+spray: B      0.115953    0.256521   0.452022    0.6527  -0.396208   0.6281
+14
+spray: C     -2.51582     0.256521  -9.80747     &lt;1e-13  -3.02798   -2.0036
+6 
+spray: D     -1.59632     0.256521  -6.22298     &lt;1e-7   -2.10849   -1.0841
+6 
+spray: E     -1.95122     0.256521  -7.60647     &lt;1e-9   -2.46338   -1.4390
+6 
+spray: F      0.257939    0.256521   1.00553     0.3183  -0.254222   0.7700
+99
+───────────────────────────────────────────────────────────────────────────
+──
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Int</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>m3</span><span class='hljl-oB'>.</span><span class='hljl-n'>mm</span><span class='hljl-oB'>.</span><span class='hljl-n'>m</span><span class='hljl-p'>)</span><span class='hljl-t'>   </span><span class='hljl-cs'># show Int values to emphasize differences</span>
+</pre>
+
+
+<pre class="output">
+72×6 Array&#123;Int64,2&#125;:
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ ⋮              ⋮
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+ 1  0  0  0  0  1
+</pre>
+
+
+<p>This model allows for different mean responses for the different sprays.  The interpretation of the individual coefficients is best understood by fitting an alternative representation where the model matrix is a set of indicator columns for the individual sprays.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f3a</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-t'> </span><span class='hljl-nf'>sqrt</span><span class='hljl-p'>(</span><span class='hljl-n'>count</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>spray</span><span class='hljl-t'>
+</span><span class='hljl-n'>m3a</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>LinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f3a</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>InsectSprays</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.LinearModel&#123;GLM.LmResp&#123;Array&#123;Float64,1
+&#125;&#125;,GLM.DensePredChol&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2
+&#125;&#125;&#125;&#125;,Array&#123;Float64,2&#125;&#125;
+
+:&#40;sqrt&#40;count&#41;&#41; ~ 0 &#43; spray
+
+Coefficients:
+────────────────────────────────────────────────────────────────────────
+          Estimate  Std. Error   t value  Pr&#40;&gt;|t|&#41;  Lower 95&#37;  Upper 95&#37;
+────────────────────────────────────────────────────────────────────────
+spray: A   3.76068    0.181388  20.7328     &lt;1e-29   3.39853     4.12283
+spray: B   3.87663    0.181388  21.3721     &lt;1e-30   3.51448     4.23878
+spray: C   1.24486    0.181388   6.86296    &lt;1e-8    0.882705    1.60701
+spray: D   2.16435    0.181388  11.9322     &lt;1e-17   1.8022      2.52651
+spray: E   1.80946    0.181388   9.97566    &lt;1e-14   1.44731     2.17161
+spray: F   4.01862    0.181388  22.1549     &lt;1e-31   3.65646     4.38077
+────────────────────────────────────────────────────────────────────────
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Int</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>m3a</span><span class='hljl-oB'>.</span><span class='hljl-n'>mm</span><span class='hljl-oB'>.</span><span class='hljl-n'>m</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+72×6 Array&#123;Int64,2&#125;:
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ 1  0  0  0  0  0
+ ⋮              ⋮
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+ 0  0  0  0  0  1
+</pre>
+
+
+<p>The six columns correspond to the six different sprays.  The first column is 1 for each observation &#40;row&#41; made with spray <code>A</code> and 0 for the other rows.  Similarly the second column is 1 for spray <code>B</code> and 0 for the others, and so on.  These are called <em>indicator columns</em> for the levels of the <code>spray</code> factor.  In the machine learning literature the rows are said to have a <em>one-hot</em> encoding in that all the elements are zero except for the one corresponding to the spray used.</p>
+<p>The first question to answer is whether the different sprays produce &quot;significantly different&quot; mean responses.  To phrase this as a comparison of models the null model should be a model for the same response &#40;i.e. <code>sqrt&#40;count&#41;</code>&#41; but with only one parameter representing the typical response.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>m4</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>LinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-p'>(</span><span class='hljl-nf'>sqrt</span><span class='hljl-p'>(</span><span class='hljl-n'>count</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>),</span><span class='hljl-t'> </span><span class='hljl-n'>InsectSprays</span><span class='hljl-p'>)</span><span class='hljl-t'>
+</span><span class='hljl-nf'>ftest</span><span class='hljl-p'>(</span><span class='hljl-n'>m3</span><span class='hljl-oB'>.</span><span class='hljl-n'>model</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>m4</span><span class='hljl-oB'>.</span><span class='hljl-n'>model</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+Res. DOF DOF ΔDOF      SSR     ΔSSR     R²    ΔR²      F*  p&#40;&gt;F&#41;
+Model 1       66   7       26.0580          0.7724                      
+Model 2       71   2   -5 114.4958 -88.4379 0.0000 0.7724 44.7993 &lt;1e-19
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>ftest</span><span class='hljl-p'>(</span><span class='hljl-n'>m3a</span><span class='hljl-oB'>.</span><span class='hljl-n'>model</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>m4</span><span class='hljl-oB'>.</span><span class='hljl-n'>model</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+Res. DOF DOF ΔDOF      SSR     ΔSSR     R²    ΔR²      F*  p&#40;&gt;F&#41;
+Model 1       66   7       26.0580          0.7724                      
+Model 2       71   2   -5 114.4958 -88.4379 0.0000 0.7724 44.7993 &lt;1e-19
+</pre>
+
+
+<p>The answer, as one would conclude from the data plot, is that the model allowing for different means from different sprays, <code>m3</code>, does a much better job than does the one, <code>m4</code>, that requires a common mean.  Notice that the test produces the same results when comparing <code>m4</code> against either <code>m3</code> or <code>m3a</code>.  Models <code>m3</code> and <code>m3a</code>are equivalent in the sense that the column spans of the two model matrices are the same.</p>
+<p>The estimated coefficients for models <code>m3</code> and <code>m3a</code> have different interpretations even though the last five coefficients have the same names in the two models.  It is reasonably easy to understand the coefficient estimates in model <code>m3a</code>.  These are the mean or average <code>sqrt&#40;count&#41;</code> for each spray.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>by</span><span class='hljl-p'>(</span><span class='hljl-n'>InsectSprays</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:spray</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>mn</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-sc'>:count</span><span class='hljl-t'> </span><span class='hljl-oB'>=&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>x</span><span class='hljl-t'> </span><span class='hljl-oB'>-&gt;</span><span class='hljl-t'> </span><span class='hljl-nf'>mean</span><span class='hljl-p'>(</span><span class='hljl-n'>sqrt</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>x</span><span class='hljl-p'>)))</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>spray</th><th>mn</th></tr><tr><th></th><th>Categorical…</th><th>Float64</th></tr></thead><tbody><p>6 rows × 2 columns</p><tr><th>1</th><td>A</td><td>3.76068</td></tr><tr><th>2</th><td>B</td><td>3.87663</td></tr><tr><th>3</th><td>C</td><td>1.24486</td></tr><tr><th>4</th><td>D</td><td>2.16435</td></tr><tr><th>5</th><td>E</td><td>1.80946</td></tr><tr><th>6</th><td>F</td><td>4.01862</td></tr></tbody></table>
+
+<p>Notice that the mean square root of the counts for spray <code>A</code> is the estimated <code>&#40;Intercept&#41;</code> in model <code>m3</code>.  Furthermore, the coefficient labeled <code>spray: B</code> in <code>m3</code> is the difference in the means for spray <code>B</code> and spray <code>A</code>.  We say that in model <code>m3</code> spray <code>A</code> is the reference level and the coefficients for the other sprays are the differences in means between that spray and spray <code>A</code>.</p>
+<p>The main lesson here is not to pay too much attention to individual coefficients by themselves.  They can only be interpreted in the context of the entire model.</p>
+<h1>Fitting Generalized Linear Models</h1>
+<p>Another way to model the <code>InsectSprays</code> data is to consider the response, which is a count, as a realization of a <a href="https://en.wikipedia.org/wiki/Poisson_distribution"><em>Poisson</em></a> random variable with, possibly, different mean parameters for each spray.  This is an example of a generalized linear model &#40;GLM&#41;.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f5</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-t'> </span><span class='hljl-n'>count</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>spray</span><span class='hljl-t'>
+</span><span class='hljl-n'>m5</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>GeneralizedLinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f5</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>InsectSprays</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>Poisson</span><span class='hljl-p'>())</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.GeneralizedLinearModel&#123;GLM.GlmResp&#123;Arr
+ay&#123;Float64,1&#125;,Distributions.Poisson&#123;Float64&#125;,GLM.LogLink&#125;,GLM.DensePredChol
+&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;&#125;&#125;,Array&#123;Float64,2
+&#125;&#125;
+
+count ~ 1 &#43; spray
+
+Coefficients:
+───────────────────────────────────────────────────────────────────────────
+───
+               Estimate  Std. Error    z value  Pr&#40;&gt;|z|&#41;  Lower 95&#37;  Upper 
+95&#37;
+───────────────────────────────────────────────────────────────────────────
+───
+&#40;Intercept&#41;   2.67415     0.0758098  35.2745      &lt;1e-99   2.52556    2.822
+73 
+spray: B      0.0558805   0.105745    0.528448    0.5972  -0.151375   0.263
+136
+spray: C     -1.94018     0.213737   -9.07739     &lt;1e-18  -2.3591    -1.521
+26 
+spray: D     -1.08152     0.150652   -7.1789      &lt;1e-12  -1.37679   -0.786
+245
+spray: E     -1.42139     0.171919   -8.26776     &lt;1e-15  -1.75834   -1.084
+43 
+spray: F      0.139262    0.103668    1.34334     0.1792  -0.063924   0.342
+448
+───────────────────────────────────────────────────────────────────────────
+───
+</pre>
+
+
+<p>The canonical link function for the Poisson distribution is the <code>log</code> function &#40;i.e. the natural logarithm or log to the base <code>e</code>&#41;.  The linear predictor, <span class="math">$\mathbf{\eta}=\mathbf{X}\mathbf{\beta}$</span>, models the logarithm of the insect count, taking into account how the variance of the Poisson distribution depends on its mean.</p>
+<p>In the case of a linear model the quality of the fit is measured by the sum of squared residuals.  For generalized linear models, the coefficients are estimated by those values that maximize the <em>likelihood</em> of the parameters given the observed data.  &#40;This is explained in more detail later.&#41; For comparison of models we use a version of the likelihood called the <em>deviance</em> for comparisons.  The deviance is, up to a constant, negative twice the log-likelihood.  It is the analogue of the sum of squared residuals for generalized linear models.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>deviance</span><span class='hljl-p'>(</span><span class='hljl-n'>m5</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+98.32866302084145
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f6</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-t'> </span><span class='hljl-n'>count</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+</span><span class='hljl-n'>m6</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>GeneralizedLinearModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f6</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>InsectSprays</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>Poisson</span><span class='hljl-p'>())</span>
+</pre>
+
+
+<pre class="output">
+StatsModels.TableRegressionModel&#123;GLM.GeneralizedLinearModel&#123;GLM.GlmResp&#123;Arr
+ay&#123;Float64,1&#125;,Distributions.Poisson&#123;Float64&#125;,GLM.LogLink&#125;,GLM.DensePredChol
+&#123;Float64,LinearAlgebra.Cholesky&#123;Float64,Array&#123;Float64,2&#125;&#125;&#125;&#125;,Array&#123;Float64,2
+&#125;&#125;
+
+count ~ 1
+
+Coefficients:
+──────────────────────────────────────────────────────────────────────────
+             Estimate  Std. Error  z value  Pr&#40;&gt;|z|&#41;  Lower 95&#37;  Upper 95&#37;
+──────────────────────────────────────────────────────────────────────────
+&#40;Intercept&#41;   2.25129   0.0382219  58.9005    &lt;1e-99    2.17638    2.32621
+──────────────────────────────────────────────────────────────────────────
+</pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>deviance</span><span class='hljl-p'>(</span><span class='hljl-n'>m6</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+409.0411927232468
+</pre>
+
+
+<p>The difference in the deviance of nested GLMs is should have a <span class="math">$\chi^2$</span> distribution if the null model is &quot;correct&quot;, where the degrees of freedom for the <span class="math">$\chi^2$</span> is the difference in the number of coefficients.  &#40;To be more precise, it is the difference in the dimension of the column spans of the model matrices.&#41;</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>dof</span><span class='hljl-p'>(</span><span class='hljl-n'>m5</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+6
+</pre>
+
+
+<p>A p-value is calculated as the probability of exceeding the difference in the deviances for a <span class="math">$\chi^2$</span> with degrees of freedom given by the difference in the model degrees of freedom.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>ccdf</span><span class='hljl-p'>(</span><span class='hljl-nf'>Chisq</span><span class='hljl-p'>(</span><span class='hljl-nf'>dof</span><span class='hljl-p'>(</span><span class='hljl-n'>m5</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-nf'>dof</span><span class='hljl-p'>(</span><span class='hljl-n'>m6</span><span class='hljl-p'>)),</span><span class='hljl-t'> </span><span class='hljl-nf'>deviance</span><span class='hljl-p'>(</span><span class='hljl-n'>m6</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-nf'>deviance</span><span class='hljl-p'>(</span><span class='hljl-n'>m5</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+4.9793748864669774e-65
+</pre>
+
+
+<p>Again, this is a strong indication that there are differences between the sprays.</p>
+<h1>Fitting nonlinear regression models</h1>
+<p>The models fit to different data sets up to this point have been <em>empirical models</em>.  That is, the form of the model is determined by examining the observed data and not based on consideration of the mechanism that may be generating the data.  The ability to extrapolate from empirical models is somewhat limited.  In contrast, parameters for mechanistic models often have an intrinsic interpretation that may apply outside the confines of the current experiment.</p>
+<p>Unfortunately, most mechanistic models do not have a convenient form that can be expressed as a linear predictor.  For example, the <code>Theoph</code> data set provides the serum concentration of the drug <a href="https://en.wikipedia.org/wiki/Theophylline">Theophylline</a> in each of several volunteers at a number of times following oral administration of a dose.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Theoph</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rcopy</span><span class='hljl-p'>(</span><span class='hljl-so'>R&quot;Theoph&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>Subject</th><th>Wt</th><th>Dose</th><th>Time</th><th>conc</th></tr><tr><th></th><th>Categorical…</th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>132 rows × 5 columns</p><tr><th>1</th><td>1</td><td>79.6</td><td>4.02</td><td>0.0</td><td>0.74</td></tr><tr><th>2</th><td>1</td><td>79.6</td><td>4.02</td><td>0.25</td><td>2.84</td></tr><tr><th>3</th><td>1</td><td>79.6</td><td>4.02</td><td>0.57</td><td>6.57</td></tr><tr><th>4</th><td>1</td><td>79.6</td><td>4.02</td><td>1.12</td><td>10.5</td></tr><tr><th>5</th><td>1</td><td>79.6</td><td>4.02</td><td>2.02</td><td>9.66</td></tr><tr><th>6</th><td>1</td><td>79.6</td><td>4.02</td><td>3.82</td><td>8.58</td></tr><tr><th>7</th><td>1</td><td>79.6</td><td>4.02</td><td>5.1</td><td>8.36</td></tr><tr><th>8</th><td>1</td><td>79.6</td><td>4.02</td><td>7.03</td><td>7.47</td></tr><tr><th>9</th><td>1</td><td>79.6</td><td>4.02</td><td>9.05</td><td>6.89</td></tr><tr><th>10</th><td>1</td><td>79.6</td><td>4.02</td><td>12.12</td><td>5.94</td></tr><tr><th>11</th><td>1</td><td>79.6</td><td>4.02</td><td>24.37</td><td>3.28</td></tr><tr><th>12</th><td>2</td><td>72.4</td><td>4.4</td><td>0.0</td><td>0.0</td></tr><tr><th>13</th><td>2</td><td>72.4</td><td>4.4</td><td>0.27</td><td>1.72</td></tr><tr><th>14</th><td>2</td><td>72.4</td><td>4.4</td><td>0.52</td><td>7.91</td></tr><tr><th>15</th><td>2</td><td>72.4</td><td>4.4</td><td>1.0</td><td>8.31</td></tr><tr><th>16</th><td>2</td><td>72.4</td><td>4.4</td><td>1.92</td><td>8.33</td></tr><tr><th>17</th><td>2</td><td>72.4</td><td>4.4</td><td>3.5</td><td>6.85</td></tr><tr><th>18</th><td>2</td><td>72.4</td><td>4.4</td><td>5.02</td><td>6.08</td></tr><tr><th>19</th><td>2</td><td>72.4</td><td>4.4</td><td>7.03</td><td>5.4</td></tr><tr><th>20</th><td>2</td><td>72.4</td><td>4.4</td><td>9.0</td><td>4.55</td></tr><tr><th>21</th><td>2</td><td>72.4</td><td>4.4</td><td>12.0</td><td>3.01</td></tr><tr><th>22</th><td>2</td><td>72.4</td><td>4.4</td><td>24.3</td><td>0.9</td></tr><tr><th>23</th><td>3</td><td>70.5</td><td>4.53</td><td>0.0</td><td>0.0</td></tr><tr><th>24</th><td>3</td><td>70.5</td><td>4.53</td><td>0.27</td><td>4.4</td></tr><tr><th>25</th><td>3</td><td>70.5</td><td>4.53</td><td>0.58</td><td>6.9</td></tr><tr><th>26</th><td>3</td><td>70.5</td><td>4.53</td><td>1.02</td><td>8.2</td></tr><tr><th>27</th><td>3</td><td>70.5</td><td>4.53</td><td>2.02</td><td>7.8</td></tr><tr><th>28</th><td>3</td><td>70.5</td><td>4.53</td><td>3.62</td><td>7.5</td></tr><tr><th>29</th><td>3</td><td>70.5</td><td>4.53</td><td>5.08</td><td>6.2</td></tr><tr><th>30</th><td>3</td><td>70.5</td><td>4.53</td><td>7.07</td><td>5.3</td></tr><tr><th>31</th><td>3</td><td>70.5</td><td>4.53</td><td>9.0</td><td>4.9</td></tr><tr><th>32</th><td>3</td><td>70.5</td><td>4.53</td><td>12.15</td><td>3.7</td></tr><tr><th>33</th><td>3</td><td>70.5</td><td>4.53</td><td>24.17</td><td>1.05</td></tr><tr><th>34</th><td>4</td><td>72.7</td><td>4.4</td><td>0.0</td><td>0.0</td></tr><tr><th>35</th><td>4</td><td>72.7</td><td>4.4</td><td>0.35</td><td>1.89</td></tr><tr><th>36</th><td>4</td><td>72.7</td><td>4.4</td><td>0.6</td><td>4.6</td></tr><tr><th>37</th><td>4</td><td>72.7</td><td>4.4</td><td>1.07</td><td>8.6</td></tr><tr><th>38</th><td>4</td><td>72.7</td><td>4.4</td><td>2.13</td><td>8.38</td></tr><tr><th>39</th><td>4</td><td>72.7</td><td>4.4</td><td>3.5</td><td>7.54</td></tr><tr><th>40</th><td>4</td><td>72.7</td><td>4.4</td><td>5.02</td><td>6.88</td></tr><tr><th>41</th><td>4</td><td>72.7</td><td>4.4</td><td>7.02</td><td>5.78</td></tr><tr><th>42</th><td>4</td><td>72.7</td><td>4.4</td><td>9.02</td><td>5.33</td></tr><tr><th>43</th><td>4</td><td>72.7</td><td>4.4</td><td>11.98</td><td>4.19</td></tr><tr><th>44</th><td>4</td><td>72.7</td><td>4.4</td><td>24.65</td><td>1.15</td></tr><tr><th>45</th><td>5</td><td>54.6</td><td>5.86</td><td>0.0</td><td>0.0</td></tr><tr><th>46</th><td>5</td><td>54.6</td><td>5.86</td><td>0.3</td><td>2.02</td></tr><tr><th>47</th><td>5</td><td>54.6</td><td>5.86</td><td>0.52</td><td>5.63</td></tr><tr><th>48</th><td>5</td><td>54.6</td><td>5.86</td><td>1.0</td><td>11.4</td></tr><tr><th>49</th><td>5</td><td>54.6</td><td>5.86</td><td>2.02</td><td>9.33</td></tr><tr><th>50</th><td>5</td><td>54.6</td><td>5.86</td><td>3.5</td><td>8.74</td></tr><tr><th>51</th><td>5</td><td>54.6</td><td>5.86</td><td>5.02</td><td>7.56</td></tr><tr><th>52</th><td>5</td><td>54.6</td><td>5.86</td><td>7.02</td><td>7.09</td></tr><tr><th>53</th><td>5</td><td>54.6</td><td>5.86</td><td>9.1</td><td>5.9</td></tr><tr><th>54</th><td>5</td><td>54.6</td><td>5.86</td><td>12.0</td><td>4.37</td></tr><tr><th>55</th><td>5</td><td>54.6</td><td>5.86</td><td>24.35</td><td>1.57</td></tr><tr><th>56</th><td>6</td><td>80.0</td><td>4.0</td><td>0.0</td><td>0.0</td></tr><tr><th>57</th><td>6</td><td>80.0</td><td>4.0</td><td>0.27</td><td>1.29</td></tr><tr><th>58</th><td>6</td><td>80.0</td><td>4.0</td><td>0.58</td><td>3.08</td></tr><tr><th>59</th><td>6</td><td>80.0</td><td>4.0</td><td>1.15</td><td>6.44</td></tr><tr><th>60</th><td>6</td><td>80.0</td><td>4.0</td><td>2.03</td><td>6.32</td></tr><tr><th>61</th><td>6</td><td>80.0</td><td>4.0</td><td>3.57</td><td>5.53</td></tr><tr><th>62</th><td>6</td><td>80.0</td><td>4.0</td><td>5.0</td><td>4.94</td></tr><tr><th>63</th><td>6</td><td>80.0</td><td>4.0</td><td>7.0</td><td>4.02</td></tr><tr><th>64</th><td>6</td><td>80.0</td><td>4.0</td><td>9.22</td><td>3.46</td></tr><tr><th>65</th><td>6</td><td>80.0</td><td>4.0</td><td>12.1</td><td>2.78</td></tr><tr><th>66</th><td>6</td><td>80.0</td><td>4.0</td><td>23.85</td><td>0.92</td></tr><tr><th>67</th><td>7</td><td>64.6</td><td>4.95</td><td>0.0</td><td>0.15</td></tr><tr><th>68</th><td>7</td><td>64.6</td><td>4.95</td><td>0.25</td><td>0.85</td></tr><tr><th>69</th><td>7</td><td>64.6</td><td>4.95</td><td>0.5</td><td>2.35</td></tr><tr><th>70</th><td>7</td><td>64.6</td><td>4.95</td><td>1.02</td><td>5.02</td></tr><tr><th>71</th><td>7</td><td>64.6</td><td>4.95</td><td>2.02</td><td>6.58</td></tr><tr><th>72</th><td>7</td><td>64.6</td><td>4.95</td><td>3.48</td><td>7.09</td></tr><tr><th>73</th><td>7</td><td>64.6</td><td>4.95</td><td>5.0</td><td>6.66</td></tr><tr><th>74</th><td>7</td><td>64.6</td><td>4.95</td><td>6.98</td><td>5.25</td></tr><tr><th>75</th><td>7</td><td>64.6</td><td>4.95</td><td>9.0</td><td>4.39</td></tr><tr><th>76</th><td>7</td><td>64.6</td><td>4.95</td><td>12.05</td><td>3.53</td></tr><tr><th>77</th><td>7</td><td>64.6</td><td>4.95</td><td>24.22</td><td>1.15</td></tr><tr><th>78</th><td>8</td><td>70.5</td><td>4.53</td><td>0.0</td><td>0.0</td></tr><tr><th>79</th><td>8</td><td>70.5</td><td>4.53</td><td>0.25</td><td>3.05</td></tr><tr><th>80</th><td>8</td><td>70.5</td><td>4.53</td><td>0.52</td><td>3.05</td></tr><tr><th>81</th><td>8</td><td>70.5</td><td>4.53</td><td>0.98</td><td>7.31</td></tr><tr><th>82</th><td>8</td><td>70.5</td><td>4.53</td><td>2.02</td><td>7.56</td></tr><tr><th>83</th><td>8</td><td>70.5</td><td>4.53</td><td>3.53</td><td>6.59</td></tr><tr><th>84</th><td>8</td><td>70.5</td><td>4.53</td><td>5.05</td><td>5.88</td></tr><tr><th>85</th><td>8</td><td>70.5</td><td>4.53</td><td>7.15</td><td>4.73</td></tr><tr><th>86</th><td>8</td><td>70.5</td><td>4.53</td><td>9.07</td><td>4.57</td></tr><tr><th>87</th><td>8</td><td>70.5</td><td>4.53</td><td>12.1</td><td>3.0</td></tr><tr><th>88</th><td>8</td><td>70.5</td><td>4.53</td><td>24.12</td><td>1.25</td></tr><tr><th>89</th><td>9</td><td>86.4</td><td>3.1</td><td>0.0</td><td>0.0</td></tr><tr><th>90</th><td>9</td><td>86.4</td><td>3.1</td><td>0.3</td><td>7.37</td></tr><tr><th>91</th><td>9</td><td>86.4</td><td>3.1</td><td>0.63</td><td>9.03</td></tr><tr><th>92</th><td>9</td><td>86.4</td><td>3.1</td><td>1.05</td><td>7.14</td></tr><tr><th>93</th><td>9</td><td>86.4</td><td>3.1</td><td>2.02</td><td>6.33</td></tr><tr><th>94</th><td>9</td><td>86.4</td><td>3.1</td><td>3.53</td><td>5.66</td></tr><tr><th>95</th><td>9</td><td>86.4</td><td>3.1</td><td>5.02</td><td>5.67</td></tr><tr><th>96</th><td>9</td><td>86.4</td><td>3.1</td><td>7.17</td><td>4.24</td></tr><tr><th>97</th><td>9</td><td>86.4</td><td>3.1</td><td>8.8</td><td>4.11</td></tr><tr><th>98</th><td>9</td><td>86.4</td><td>3.1</td><td>11.6</td><td>3.16</td></tr><tr><th>99</th><td>9</td><td>86.4</td><td>3.1</td><td>24.43</td><td>1.12</td></tr><tr><th>100</th><td>10</td><td>58.2</td><td>5.5</td><td>0.0</td><td>0.24</td></tr><tr><th>101</th><td>10</td><td>58.2</td><td>5.5</td><td>0.37</td><td>2.89</td></tr><tr><th>102</th><td>10</td><td>58.2</td><td>5.5</td><td>0.77</td><td>5.22</td></tr><tr><th>103</th><td>10</td><td>58.2</td><td>5.5</td><td>1.02</td><td>6.41</td></tr><tr><th>104</th><td>10</td><td>58.2</td><td>5.5</td><td>2.05</td><td>7.83</td></tr><tr><th>105</th><td>10</td><td>58.2</td><td>5.5</td><td>3.55</td><td>10.21</td></tr><tr><th>106</th><td>10</td><td>58.2</td><td>5.5</td><td>5.05</td><td>9.18</td></tr><tr><th>107</th><td>10</td><td>58.2</td><td>5.5</td><td>7.08</td><td>8.02</td></tr><tr><th>108</th><td>10</td><td>58.2</td><td>5.5</td><td>9.38</td><td>7.14</td></tr><tr><th>109</th><td>10</td><td>58.2</td><td>5.5</td><td>12.1</td><td>5.68</td></tr><tr><th>110</th><td>10</td><td>58.2</td><td>5.5</td><td>23.7</td><td>2.42</td></tr><tr><th>111</th><td>11</td><td>65.0</td><td>4.92</td><td>0.0</td><td>0.0</td></tr><tr><th>112</th><td>11</td><td>65.0</td><td>4.92</td><td>0.25</td><td>4.86</td></tr><tr><th>113</th><td>11</td><td>65.0</td><td>4.92</td><td>0.5</td><td>7.24</td></tr><tr><th>114</th><td>11</td><td>65.0</td><td>4.92</td><td>0.98</td><td>8.0</td></tr><tr><th>115</th><td>11</td><td>65.0</td><td>4.92</td><td>1.98</td><td>6.81</td></tr><tr><th>116</th><td>11</td><td>65.0</td><td>4.92</td><td>3.6</td><td>5.87</td></tr><tr><th>117</th><td>11</td><td>65.0</td><td>4.92</td><td>5.02</td><td>5.22</td></tr><tr><th>118</th><td>11</td><td>65.0</td><td>4.92</td><td>7.03</td><td>4.45</td></tr><tr><th>119</th><td>11</td><td>65.0</td><td>4.92</td><td>9.03</td><td>3.62</td></tr><tr><th>120</th><td>11</td><td>65.0</td><td>4.92</td><td>12.12</td><td>2.69</td></tr><tr><th>121</th><td>11</td><td>65.0</td><td>4.92</td><td>24.08</td><td>0.86</td></tr><tr><th>122</th><td>12</td><td>60.5</td><td>5.3</td><td>0.0</td><td>0.0</td></tr><tr><th>123</th><td>12</td><td>60.5</td><td>5.3</td><td>0.25</td><td>1.25</td></tr><tr><th>124</th><td>12</td><td>60.5</td><td>5.3</td><td>0.5</td><td>3.96</td></tr><tr><th>125</th><td>12</td><td>60.5</td><td>5.3</td><td>1.0</td><td>7.82</td></tr><tr><th>126</th><td>12</td><td>60.5</td><td>5.3</td><td>2.0</td><td>9.72</td></tr><tr><th>127</th><td>12</td><td>60.5</td><td>5.3</td><td>3.52</td><td>9.75</td></tr><tr><th>128</th><td>12</td><td>60.5</td><td>5.3</td><td>5.07</td><td>8.57</td></tr><tr><th>129</th><td>12</td><td>60.5</td><td>5.3</td><td>7.07</td><td>6.59</td></tr><tr><th>130</th><td>12</td><td>60.5</td><td>5.3</td><td>9.03</td><td>6.11</td></tr><tr><th>131</th><td>12</td><td>60.5</td><td>5.3</td><td>12.05</td><td>4.57</td></tr><tr><th>132</th><td>12</td><td>60.5</td><td>5.3</td><td>24.15</td><td>1.17</td></tr></tbody></table>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+(tpl &lt;- ggplot(Theoph, aes(Time, conc)) + geom_point() +
+    geom_line() + facet_wrap(~ Subject) +
+    xlab(&quot;Time since drug adminstration (hr)&quot;) +
+    ylab(&quot;Serum concentration (mg/L)&quot;))
+&quot;&quot;&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>The panels are arranged by increasing maximum concentration starting at the upper left and going across rows to the lower right.  A <a href="https://en.wikipedia.org/wiki/Pharmacokinetics">pharmacokinetic</a> model for concentration in a single &quot;compartment&quot; after a single oral dose can be written in terms of an <em>elimination rate constant</em>, <span class="math">$k$</span>, an <em>absorption rate constant</em>, <span class="math">$k_a$</span>, and the effective <em>volume of distribution</em>, <span class="math">$V$</span>, as</p>
+<p class="math">\[
+c(t) = \frac{\mathrm{dose}}{V} \frac{k_a - k}{k_a} \left(e^{-k\,t} - e^{-k_a\,t}\right)
+\]</p>
+<p>All three parameters - <span class="math">$k$</span>, <span class="math">$k_a$</span>, and <span class="math">$V$</span> - must be positive to be physically meaningful and, typically, their effect is more on a logarithmic scale.  Hence we write the model function in terms of parameters <code>lk</code>, <code>lka</code>, and <code>lV</code>, the logarithms of the parameters.  The parameters are passed to the model function as a <code>NamedTuple</code> which is a named collection of values, as is each row of data.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>sdOral1C</span><span class='hljl-p'>(</span><span class='hljl-n'>p</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>d</span><span class='hljl-p'>)</span><span class='hljl-t'>
+    </span><span class='hljl-n'>k</span><span class='hljl-t'>  </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>exp</span><span class='hljl-p'>(</span><span class='hljl-n'>p</span><span class='hljl-oB'>.</span><span class='hljl-n'>lk</span><span class='hljl-p'>)</span><span class='hljl-t'>   </span><span class='hljl-cs'># transform from logarithm to rate constant</span><span class='hljl-t'>
+    </span><span class='hljl-n'>ka</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>exp</span><span class='hljl-p'>(</span><span class='hljl-n'>p</span><span class='hljl-oB'>.</span><span class='hljl-n'>lka</span><span class='hljl-p'>)</span><span class='hljl-t'>
+    </span><span class='hljl-n'>V</span><span class='hljl-t'>  </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>exp</span><span class='hljl-p'>(</span><span class='hljl-n'>p</span><span class='hljl-oB'>.</span><span class='hljl-n'>lV</span><span class='hljl-p'>)</span><span class='hljl-t'>
+    </span><span class='hljl-n'>t</span><span class='hljl-t'>  </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>d</span><span class='hljl-oB'>.</span><span class='hljl-n'>Time</span><span class='hljl-t'>
+    </span><span class='hljl-p'>(</span><span class='hljl-n'>d</span><span class='hljl-oB'>.</span><span class='hljl-n'>Dose</span><span class='hljl-oB'>/</span><span class='hljl-n'>V</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>((</span><span class='hljl-n'>ka</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>)</span><span class='hljl-oB'>/</span><span class='hljl-n'>ka</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-nf'>exp</span><span class='hljl-p'>(</span><span class='hljl-oB'>-</span><span class='hljl-n'>t</span><span class='hljl-oB'>*</span><span class='hljl-n'>k</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-nf'>exp</span><span class='hljl-p'>(</span><span class='hljl-oB'>-</span><span class='hljl-n'>t</span><span class='hljl-oB'>*</span><span class='hljl-n'>ka</span><span class='hljl-p'>))</span><span class='hljl-t'>
+</span><span class='hljl-k'>end</span>
+</pre>
+
+
+<pre class="output">
+sdOral1C &#40;generic function with 1 method&#41;
+</pre>
+
+
+<p>Although the data are in the form of a DataFrame, which is a collection of columns, each of the same length, it is more convenient to access the values row-wise.  The <code>Tables</code> package allows transformation back and forth between a column-oriented form and a row-oriented form.  Consider the data from just one subject</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>subj6col</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-nf'>groupby</span><span class='hljl-p'>(</span><span class='hljl-n'>Theoph</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:Subject</span><span class='hljl-p'>))</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>Subject</th><th>Wt</th><th>Dose</th><th>Time</th><th>conc</th></tr><tr><th></th><th>Categorical…</th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>11 rows × 5 columns</p><tr><th>1</th><td>6</td><td>80.0</td><td>4.0</td><td>0.0</td><td>0.0</td></tr><tr><th>2</th><td>6</td><td>80.0</td><td>4.0</td><td>0.27</td><td>1.29</td></tr><tr><th>3</th><td>6</td><td>80.0</td><td>4.0</td><td>0.58</td><td>3.08</td></tr><tr><th>4</th><td>6</td><td>80.0</td><td>4.0</td><td>1.15</td><td>6.44</td></tr><tr><th>5</th><td>6</td><td>80.0</td><td>4.0</td><td>2.03</td><td>6.32</td></tr><tr><th>6</th><td>6</td><td>80.0</td><td>4.0</td><td>3.57</td><td>5.53</td></tr><tr><th>7</th><td>6</td><td>80.0</td><td>4.0</td><td>5.0</td><td>4.94</td></tr><tr><th>8</th><td>6</td><td>80.0</td><td>4.0</td><td>7.0</td><td>4.02</td></tr><tr><th>9</th><td>6</td><td>80.0</td><td>4.0</td><td>9.22</td><td>3.46</td></tr><tr><th>10</th><td>6</td><td>80.0</td><td>4.0</td><td>12.1</td><td>2.78</td></tr><tr><th>11</th><td>6</td><td>80.0</td><td>4.0</td><td>23.85</td><td>0.92</td></tr></tbody></table>
+
+<p>As a row-oriented table, this becomes</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>subj6row</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>Tables</span><span class='hljl-oB'>.</span><span class='hljl-nf'>rowtable</span><span class='hljl-p'>(</span><span class='hljl-n'>subj6col</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+11-element Array&#123;NamedTuple&#123;&#40;:Subject, :Wt, :Dose, :Time, :conc&#41;,Tuple&#123;Cate
+goricalArrays.CategoricalString&#123;UInt32&#125;,Float64,Float64,Float64,Float64&#125;&#125;,1
+&#125;:
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 0.0, conc &#61; 0.0&#41;   
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 0.27, conc &#61; 1.29&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 0.58, conc &#61; 3.08&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 1.15, conc &#61; 6.44&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 2.03, conc &#61; 6.32&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 3.57, conc &#61; 5.53&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 5.0, conc &#61; 4.94&#41;  
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 7.0, conc &#61; 4.02&#41;  
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 9.22, conc &#61; 3.46&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 12.1, conc &#61; 2.78&#41; 
+ &#40;Subject &#61; &quot;6&quot;, Wt &#61; 80.0, Dose &#61; 4.0, Time &#61; 23.85, conc &#61; 0.92&#41;
+</pre>
+
+
+<p>If we set the parameters, on the logarithm scale, to be</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>pars</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>lk</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-nfB'>2.5</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>lka</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nfB'>0.5</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>lV</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-nfB'>1.0</span><span class='hljl-p'>);</span>
+</pre>
+
+
+
+<p>we can evaluate the predicted concentrations as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>pred0</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-nf'>sdOral1C</span><span class='hljl-p'>(</span><span class='hljl-n'>pars</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>d</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>d</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-n'>subj6row</span><span class='hljl-p'>]</span>
+</pre>
+
+
+<pre class="output">
+11-element Array&#123;Float64,1&#125;:
+ 0.0               
+ 3.4854872029148973
+ 5.880625645344529 
+ 7.849647937045211 
+ 8.382358620938172 
+ 7.67870212828006  
+ 6.851062474308255 
+ 5.816001034947781 
+ 4.847198744697598 
+ 3.8266765729690566
+ 1.4586304725569477
+</pre>
+
+
+<p>Finally we obtain the least squares estimates of the parameters</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>m7</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>NLregModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>subj6row</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:conc</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>sdOral1C</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>pars</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+Nonlinear regression model fit by maximum likelihood
+
+Data schema &#40;response variable is conc&#41;
+Tables.Schema:
+ :Subject  CategoricalArrays.CategoricalString&#123;UInt32&#125;
+ :Wt       Float64                                    
+ :Dose     Float64                                    
+ :Time     Float64                                    
+ :conc     Float64                                    
+
+ Sum of squared residuals at convergence: 2.4442402175600475
+ Achieved convergence criterion:          9.530472147639165e-6
+
+ Number of observations:                  11
+
+ Parameter estimates
+──────────────────────────────────────
+      Estimate  Std.Error  t-statistic
+──────────────────────────────────────
+lk   -2.30734    0.196063   -11.7684  
+lka   0.151631   0.213966     0.708667
+lV   -0.844714   0.164773    -5.12655 
+──────────────────────────────────────
+</pre>
+
+
+<h2>Review</h2>
+<p>To review, we considered three types of statistical models for a response as a function of covariates.  The response is modeled as having come from a multivariate distribution, <span class="math">$\mathcal{Y}$</span>.  For models based on a <em>linear predictor</em>, <span class="math">$\mathbf{\eta}=\mathbf{X\beta}$</span>, the <em>model matrix</em>, <span class="math">$\mathbf{X}$</span> and the response vector, <span class="math">$\mathbf{y}$</span> are generated from the data table and a model formula.  The parameters <span class="math">$\mathbf{\beta}$</span> in the linear predictor are also called <em>coefficients</em>.</p>
+<p>The model parameters &#40;except, possibly, for a scale parameter&#41; affect the distribution of the response only through its mean, <span class="math">$\mathbf{\mu}$</span>, which is</p>
+<table><tr><th>Model type</th><th>Abbr.</th><th><span class="math">$\mathbf{\mu}$</span></th><th>Parameters estimated by</th></tr><tr><td>Linear Model</td><td>LM</td><td><span class="math">$\mathbf{\eta}$</span></td><td>linear least squares &#40;direct&#41;</td></tr><tr><td>Generalized Linear Model</td><td>GLM</td><td><span class="math">$\mathbf{g}^{-1}(\mathbf{\eta})$</span></td><td>iteratively reweighted least squares</td></tr><tr><td>Nonlinear Regression Model</td><td>NLRM</td><td><span class="math">$\mathbf{\mu}(\mathbf{\varphi})$</span></td><td>nonlinear least squares</td></tr></table>
+<p>where <span class="math">$g^{-1}(\eta)$</span> is the inverse link function applied to the linear predictor component-wise.  &#40;In Julia terminology, the scalar function is <em>broadcast</em> over the <span class="math">$\eta$</span> vector to produce the <span class="math">$\mu$</span> vector.&#41;  For the nonlinear regression model the mean function <span class="math">$\mu(\varphi)$</span> is a general  expression depending on parameters, <span class="math">$\varphi$</span>, and on the covariates.</p>
+<p>For LMs and NLRs the distribution of <span class="math">$\mathcal{Y}$</span> is a <em>spherical Gaussian</em> &#40;or &quot;normal&quot;&#41; distribution, <span class="math">$\mathcal{N}(\mu,\sigma^2\mathbf{I})$</span>.  &#40;The parameter <span class="math">$\sigma$</span> is an example of a scale parameter - it simply expands or shrinks the distribution without otherwise changing it.&#41;  The individual elements of <span class="math">$\mathcal{Y}$</span> are independent and have constant variance.  They differ only in the value of the mean for each element.</p>
+<p>In a GLM the distribution of the vector-valued response, <span class="math">$\mathcal{Y}$</span>, is from a particular family, such as Bernoulli for a binary response or Poisson for count data.  The inverse link takes the linear predictor value, which is unbounded, to a constrained region in which the mean exists.  For example, the mean of a Bernoulli must be in <span class="math">$(0, 1)$</span> and the mean of a Poisson random variable must be positive.  Individual elements of <span class="math">$\mathcal{Y}$</span> are independent.  The distributions differ only in their means.  If there is a scale parameter in the distribution it is common to all elements.</p>
+<p>Columns of the model matrix <span class="math">$\mathbf{X}$</span> are generated from <em>terms</em> in a model formula applied to the data table.  Categorical covariates in the data table can generate multiple columns in a single <em>term</em>.</p>
+<p>Statistical test of parameters are actually comparisons of different models fit to the same data. Nested linear models can be compared with an F-test.  For other models the more general &#40;but less powerful and well-controlled&#41; <em>likelihood ratio test</em> is required.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>MixedModelsTutorials</span><span class='hljl-t'>
+</span><span class='hljl-n'>MixedModelsTutorials</span><span class='hljl-oB'>.</span><span class='hljl-nf'>tutorial_footer</span><span class='hljl-p'>(</span><span class='hljl-n'>WEAVE_ARGS</span><span class='hljl-p'>[</span><span class='hljl-sc'>:folder</span><span class='hljl-p'>],</span><span class='hljl-n'>WEAVE_ARGS</span><span class='hljl-p'>[</span><span class='hljl-sc'>:file</span><span class='hljl-p'>])</span>
+</pre>
+
+
+
+<div class="markdown"><h2>Appendix</h2>
+<p>This tutorial is part of the MixedModelsTutorials.jl repository, found at: <a href="https://github.com/RePsychLing/MixedModelsTutorials.jl">https://github.com/RePsychLing/MixedModelsTutorials.jl</a></p>
+</div>
+<div class="markdown"><p>To locally run this tutorial, do the following commands:</p>
+<pre><code>using MixedModelsTutorials
+MixedModelsTutorials.weave_file&#40;&quot;introduction&quot;,&quot;statisticalmodels.jmd&quot;&#41;</code></pre>
+</div>
+<div class="markdown"><p>Computer Information:</p>
+</div>
+<div class="markdown"><pre><code>Julia Version 1.2.0
+Commit c6da87ff4b &#40;2019-08-20 00:03 UTC&#41;
+Platform Info:
+  OS: Linux &#40;x86_64-pc-linux-gnu&#41;
+  CPU: Intel&#40;R&#41; Core&#40;TM&#41; i5-5300U CPU @ 2.30GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-6.0.1 &#40;ORCJIT, broadwell&#41;
+Environment:
+  JULIA_NUM_THREADS &#61; 2
+</code></pre>
+</div>
+<div class="markdown"><p>Package Information:</p>
+</div>
+<div class="markdown"><pre><code>Status &#96;~/.julia/environments/v1.2/Project.toml&#96;
+&#91;537997a7-5e4e-5d89-9595-2241ea00577e&#93; AbstractPlotting 0.9.10
+&#91;c52e3926-4ff0-5f6e-af25-54175e0327b1&#93; Atom 0.10.1
+&#91;6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf&#93; BenchmarkTools 0.4.3
+&#91;b99e7846-7c00-51b0-8f62-c81ae34c0232&#93; BinaryProvider 0.5.6
+&#91;336ed68f-0bac-5ca0-87d4-7b16caf5d00b&#93; CSV 0.5.12
+&#91;13f3f980-e62b-5c42-98c6-ff1f3baf88f0&#93; CairoMakie 0.1.1
+&#91;324d7699-5711-5eae-9e2f-1d82baa6b597&#93; CategoricalArrays 0.6.0
+&#91;a93c6f00-e57d-5684-b7b6-d8193f3e46c0&#93; DataFrames 0.19.4
+&#91;1313f7d8-7da2-5740-9ea0-a2ca25f37964&#93; DataFramesMeta 0.5.0
+&#91;31a5f54b-26ea-5ae9-a837-f05ce5417438&#93; Debugger 0.6.2
+&#91;31c24e10-a181-5473-b8eb-7969acd0382f&#93; Distributions 0.21.1
+&#91;e30172f5-a6a5-5a46-863b-614d45cd2de4&#93; Documenter 0.23.3
+&#91;f6369f11-7733-5829-9624-2563aa707210&#93; ForwardDiff 0.10.3
+&#91;da1fdf0e-e0ff-5433-a45f-9bb5ff651cb1&#93; FreqTables 0.3.1
+&#91;38e38edf-8417-5370-95a0-9cbb8c7f171a&#93; GLM 1.3.2
+&#91;c91e804a-d5a3-530f-b6f0-dfbca275c004&#93; Gadfly 1.0.1
+&#91;f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f&#93; HDF5 0.12.3
+&#91;7073ff75-c697-5162-941a-fcdaad2a7d2a&#93; IJulia 1.20.0
+&#91;7869d1d1-7146-5819-86e3-90919afe41df&#93; IRTools 0.2.3
+&#91;e5e0dc1b-0480-54bc-9374-aad01c23163d&#93; Juno 0.7.2
+&#91;2fda8390-95c7-5789-9bda-21331edee243&#93; LsqFit 0.8.1
+&#91;ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a&#93; Makie 0.9.5
+&#91;ff71e718-51f3-5ec2-a782-8ffcbfa3c316&#93; MixedModels 2.1.2
+&#91;df1decc4-b7b3-11e9-2182-0db5ca2e8321&#93; MixedModelsTutorials 0.1.0
+&#91;76087f3c-5699-56af-9a33-bf431cd00edd&#93; NLopt 0.5.1
+&#91;6aa54777-d00a-57a2-a775-234c624c12d3&#93; NLreg 0.2.1
+&#91;d9ec5142-1e00-5aa0-9d6a-321866360f50&#93; NamedTupleTools 0.10.0
+&#91;90014a1f-27ba-587c-ab20-58faa44d9150&#93; PDMats 0.9.10
+&#91;14b8a8f1-9102-5b29-a752-f990bacb7fe1&#93; PkgTemplates 0.6.2
+&#91;91a5bcdd-55d7-5caf-9e0b-520d859cae80&#93; Plots 0.26.3
+&#91;2dfb63ee-cc39-5dd5-95bd-886bf059d720&#93; PooledArrays 0.5.2
+&#91;c46f51b8-102a-5cf2-8d2c-8597cb0e0da7&#93; ProfileView 0.4.1
+&#91;d330b81b-6aea-500a-939a-2ce795aea3ee&#93; PyPlot 2.8.2
+&#91;6f49c342-dc21-5d91-9882-a32aef131414&#93; RCall 0.13.4
+&#91;df47a6cb-8c03-5eed-afd8-b6050d6c41da&#93; RData 0.6.3
+&#91;ce6b1742-4840-55fa-b093-852dadbb1d8b&#93; RDatasets 0.6.3
+&#91;295af30f-e4ad-537b-8983-00126c2a3abe&#93; Revise 2.2.0
+&#91;0aa819cd-b072-5ff4-a722-6bc24af294d9&#93; SQLite 0.8.1
+&#91;90137ffa-7385-5640-81b9-e52037218182&#93; StaticArrays 0.11.0
+&#91;2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91&#93; StatsBase 0.32.0
+&#91;65254759-4cff-5aa5-8326-61ce017a8c70&#93; StatsMakie 0.0.6
+&#91;3eaba693-59b7-5ba5-a881-562e759f1c8d&#93; StatsModels 0.6.3
+&#91;f3b207a7-027a-5e70-b257-86293d7955fd&#93; StatsPlots 0.12.0
+&#91;bd369af6-aec1-5ad0-b16a-f7cc5008161c&#93; Tables 0.2.11
+&#91;7ead3172-d87e-440f-bd97-80ef74db0aed&#93; Tutorials 0.1.0
+&#91;9d95f2ec-7b3d-5a63-8d20-e2491e220bb9&#93; TypedTables 1.2.0
+&#91;44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9&#93; Weave 0.9.1
+&#91;e88e6eb3-aa80-5325-afca-941959d7151f&#93; Zygote 0.3.4</code></pre>
+</div>
+
+
+
+          <HR/>
+          <div class="footer"><p>
+          Published from <a href="statisticalmodels.jmd">statisticalmodels.jmd</a> using
+          <a href="http://github.com/mpastell/Weave.jl">Weave.jl</a>
+           on 2019-09-24.
+          <p></div>
+
+
+        </div>
+      </div>
+    </div>
+  </BODY>
+</HTML>

@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<HTML lang = "en">
+<HEAD>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Linear mixed-effects models</title>
+  
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: { equationNumbers: { autoNumber: "AMS" } }
+    });
+  </script>
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+<style>
+pre.hljl {
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 5px;
+    overflow-x: auto;
+    color: rgb(68,68,68); background-color: rgb(251,251,251); }
+pre.hljl > span.hljl-t { }
+pre.hljl > span.hljl-w { }
+pre.hljl > span.hljl-e { }
+pre.hljl > span.hljl-eB { }
+pre.hljl > span.hljl-o { }
+pre.hljl > span.hljl-k { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kc { color: rgb(59,151,46); font-style: italic; }
+pre.hljl > span.hljl-kd { color: rgb(214,102,97); font-style: italic; }
+pre.hljl > span.hljl-kn { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kp { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kr { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kt { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-n { }
+pre.hljl > span.hljl-na { }
+pre.hljl > span.hljl-nb { }
+pre.hljl > span.hljl-nbp { }
+pre.hljl > span.hljl-nc { }
+pre.hljl > span.hljl-ncB { }
+pre.hljl > span.hljl-nd { color: rgb(214,102,97); }
+pre.hljl > span.hljl-ne { }
+pre.hljl > span.hljl-neB { }
+pre.hljl > span.hljl-nf { color: rgb(66,102,213); }
+pre.hljl > span.hljl-nfm { color: rgb(66,102,213); }
+pre.hljl > span.hljl-np { }
+pre.hljl > span.hljl-nl { }
+pre.hljl > span.hljl-nn { }
+pre.hljl > span.hljl-no { }
+pre.hljl > span.hljl-nt { }
+pre.hljl > span.hljl-nv { }
+pre.hljl > span.hljl-nvc { }
+pre.hljl > span.hljl-nvg { }
+pre.hljl > span.hljl-nvi { }
+pre.hljl > span.hljl-nvm { }
+pre.hljl > span.hljl-l { }
+pre.hljl > span.hljl-ld { color: rgb(148,91,176); font-style: italic; }
+pre.hljl > span.hljl-s { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sa { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sb { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sc { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sd { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdC { color: rgb(201,61,57); }
+pre.hljl > span.hljl-se { color: rgb(59,151,46); }
+pre.hljl > span.hljl-sh { color: rgb(201,61,57); }
+pre.hljl > span.hljl-si { }
+pre.hljl > span.hljl-so { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sr { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ss { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ssB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-nB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nbB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nfB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nh { color: rgb(59,151,46); }
+pre.hljl > span.hljl-ni { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nil { color: rgb(59,151,46); }
+pre.hljl > span.hljl-noB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-oB { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-ow { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-p { }
+pre.hljl > span.hljl-c { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-ch { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cm { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cp { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cpB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cs { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-csB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-g { }
+pre.hljl > span.hljl-gd { }
+pre.hljl > span.hljl-ge { }
+pre.hljl > span.hljl-geB { }
+pre.hljl > span.hljl-gh { }
+pre.hljl > span.hljl-gi { }
+pre.hljl > span.hljl-go { }
+pre.hljl > span.hljl-gp { }
+pre.hljl > span.hljl-gs { }
+pre.hljl > span.hljl-gsB { }
+pre.hljl > span.hljl-gt { }
+</style>
+
+
+
+  <style type="text/css">
+  @font-face {
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 600;
+}
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+body {
+  margin: 0;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0; /* 1 */
+  padding: 0; /* 2 */
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+table {
+  font-family: monospace, monospace;
+  font-size : 0.8em;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+thead th {
+    border-bottom: 1px solid black;
+    background-color: white;
+}
+tr:nth-child(odd){
+  background-color: rgb(248,248,248);
+}
+
+
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/29/2014
+*/
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box; }
+@media (min-width: 400px) {
+  .container {
+    width: 85%;
+    padding: 0; }
+}
+@media (min-width: 550px) {
+  .container {
+    width: 80%; }
+  .column,
+  .columns {
+    margin-left: 4%; }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0; }
+
+  .one.column,
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
+
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
+
+  .one-half.column                { width: 48%; }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
+  .offset-by-two.column,
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
+  .offset-by-three.column,
+  .offset-by-three.columns        { margin-left: 26%;            }
+  .offset-by-four.column,
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
+  .offset-by-five.column,
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
+  .offset-by-six.column,
+  .offset-by-six.columns          { margin-left: 52%;            }
+  .offset-by-seven.column,
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
+  .offset-by-eight.column,
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
+  .offset-by-nine.column,
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
+  .offset-by-ten.column,
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns     { margin-left: 52%; }
+
+}
+html {
+  font-size: 62.5%; }
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222; }
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: 300; }
+h1 { font-size: 3.6rem; line-height: 1.2;  letter-spacing: -.1rem;}
+h2 { font-size: 3.4rem; line-height: 1.25; letter-spacing: -.1rem; }
+h3 { font-size: 3.2rem; line-height: 1.3;  letter-spacing: -.1rem; }
+h4 { font-size: 2.8rem; line-height: 1.35; letter-spacing: -.08rem; }
+h5 { font-size: 2.4rem; line-height: 1.5;  letter-spacing: -.05rem; }
+h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
+
+p {
+  margin-top: 0; }
+a {
+  color: #1EAEDB; }
+a:hover {
+  color: #0FA0CE; }
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  color: #333;
+  border-color: #888;
+  outline: 0; }
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  color: #FFF;
+  background-color: #33C3F0;
+  border-color: #33C3F0; }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  color: #FFF;
+  background-color: #1EAEDB;
+  border-color: #1EAEDB; }
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box; }
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; }
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid #33C3F0;
+  outline: 0; }
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600; }
+fieldset {
+  padding: 0;
+  border-width: 0; }
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline; }
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal; }
+ul {
+  list-style: circle; }
+ol {
+  list-style: decimal; }
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%; }
+li > p {margin : 0;}
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #E1E1E1; }
+th:first-child,
+td:first-child {
+  padding-left: 0; }
+th:last-child,
+td:last-child {
+  padding-right: 0; }
+button,
+.button {
+  margin-bottom: 1rem; }
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.5rem; }
+pre,
+blockquote,
+dl,
+figure,
+table,
+p,
+ul,
+ol,
+form {
+  margin-bottom: 1.0rem; }
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 1px solid #E1E1E1; }
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre.hljl {
+  margin: 0 0 10px;
+  display: block;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding : 5px;
+}
+
+pre.output {
+  background: #ffffff;
+}
+
+pre.code {
+  background: #ffffff;
+}
+
+pre.julia-error {
+  color : red
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+}
+
+
+@media (min-width: 400px) {}
+@media (min-width: 550px) {}
+@media (min-width: 750px) {}
+@media (min-width: 1000px) {}
+@media (min-width: 1200px) {}
+
+h1.title {margin-top : 20px}
+img {max-width : 100%}
+div.title {text-align: center;}
+
+  </style>
+
+
+
+</HEAD>
+  <BODY>
+    <div class ="container">
+      <div class = "row">
+        <div class = "col-md-12 twelve columns">
+
+          <div class="title">
+            <h1 class="title">Linear mixed-effects models</h1>
+            <h5>Douglas Bates</h5>
+            
+          </div>
+
+          <p>As described in the last section a <em>mixed-effects model</em> or, more simply, a <em>mixed model</em> incorporates both <em>fixed-effects</em> parameters and <em>random effects</em>.  The random effects are associated with the levels of one or more <em>grouping factors</em>, which typically are <em>experimental units</em> or <em>observational units</em>, such as <code>subject</code> or <code>item</code>. When we have several observations on each of several subjects, say, we may expect to see subject-to-subject variability in the response but assessing this variability is not the primary purpose of the data analysis.  Instead we wish to control for this level of variability in assessing difference in experimental factors.</p>
+<p>For example, the <a href="https://rdrr.io/cran/lme4/man/sleepstudy.html"><code>sleepstudy</code></a> dataset in the <a href="https://github.com/lme4/lme4"><code>lme4</code></a> package for <code>R</code> is from a study on the effect of sleep deprivation on reaction time.  A sample from the population of interest &#40;long-distance truck drivers&#41; had their average response time measured when they were on their regular sleep schedule and after one up to nine days of sleep deprivation &#40;allowed only 3 hours per day in which to sleep&#41;.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>LinearAlgebra</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>MixedModels</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>RCall</span><span class='hljl-t'>
+</span><span class='hljl-n'>RCall</span><span class='hljl-oB'>.</span><span class='hljl-nf'>ijulia_setdevice</span><span class='hljl-p'>(</span><span class='hljl-nf'>MIME</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;image/svg+xml&quot;</span><span class='hljl-p'>),</span><span class='hljl-t'> </span><span class='hljl-n'>width</span><span class='hljl-oB'>=</span><span class='hljl-ni'>7</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>height</span><span class='hljl-oB'>=</span><span class='hljl-ni'>5</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+require(lme4, quietly=TRUE)
+require(lattice, quietly=TRUE)
+xyplot(Reaction ~ Days | Subject, sleepstudy,
+       type = c(&quot;g&quot;,&quot;p&quot;,&quot;r&quot;), layout = c(9,2),
+       index = function(x,y) coef(lm(y ~ x))[1],
+       xlab = &quot;Days of sleep deprivation&quot;,
+       ylab = &quot;Average reaction time (ms)&quot;,
+       aspect = &quot;xy&quot;)
+&quot;&quot;&quot;</span>
+</pre>
+
+
+<pre class="output">
+RCall.RObject&#123;RCall.VecSxp&#125;
+</pre>
+
+
+<p>Each panel shows the data from one subject as well as a simple linear regression line fit to that subject&#39;s data only.  The panels are ordered by increasing intercept of the within-subject line rwo-wise, starting at the bottom left.  Some subjects, e.g. 310 and 309, have fast reaction times and are almost unaffected by the sleep deprivation.  Others, e.g. 337, start with slow reaction times which then increase substantially after sleep depreivation.</p>
+<p>A suitable model for these data would include an intercept and slope for the &quot;typical&quot; subject and randomly distributed deviations from these values for each of the observed subjects.  The assumed distribution of the random effects vector is multivariate Gaussian with mean zero &#40;because they represent deviations from the population parameters&#41; and an unknown covariance matrix, <span class="math">$\Sigma$</span>, to be estimated from the data.</p>
+<p>Because <span class="math">$\Sigma$</span> is a covariance matrix it must be symmetric and be positive-definite, a condition that is similar to the requirement that a scalar variance must be positive.  In particular, a positive-definite matrix like <span class="math">$\Sigma$</span> has a &quot;square root&quot; in the sense that there is a matrix <span class="math">$\mathbf{L}$</span> such that <span class="math">$\Sigma=\mathbf{L}\mathbf{L}^\prime$</span>.  &#40;Multiplying by <span class="math">$\mathbf{L}^\prime$</span> instead of squaring <span class="math">$\mathbf{L}$</span> is necessary to ensure that the product is symmetric.&#41;  In fact, there are several such matrices <span class="math">$\mathbf{L}$</span>.  If we require that <span class="math">$\mathbf{L}$</span> is lower triangular and that its diagonal entries be positive, there is only one such matrix, which is called the lower &#40;or left&#41; Cholesky factor.</p>
+<p>As shown later, some of the expressions for the likelihood can be simplified if any scale parameter in the distribution of the response, given the random effects, is incorporated into the covariance matrix of the random effects.  We define <span class="math">$\mathbf{\lambda}$</span> to be the lower triangular matrix with non-negative diagonal entries such that</p>
+<p class="math">\[
+\Sigma=\sigma^2{\bf\lambda}{\bf\lambda}^\prime
+\]</p>
+<p>It helps to consider the example at this point to clarify these concepts.  Returning to the <code>sleepstudy</code> data shown above</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>sleepstudy</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rcopy</span><span class='hljl-p'>(</span><span class='hljl-so'>R&quot;lme4::sleepstudy&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+
+<table class="data-frame"><thead><tr><th></th><th>Reaction</th><th>Days</th><th>Subject</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Categorical…</th></tr></thead><tbody><p>180 rows × 3 columns</p><tr><th>1</th><td>249.56</td><td>0.0</td><td>308</td></tr><tr><th>2</th><td>258.705</td><td>1.0</td><td>308</td></tr><tr><th>3</th><td>250.801</td><td>2.0</td><td>308</td></tr><tr><th>4</th><td>321.44</td><td>3.0</td><td>308</td></tr><tr><th>5</th><td>356.852</td><td>4.0</td><td>308</td></tr><tr><th>6</th><td>414.69</td><td>5.0</td><td>308</td></tr><tr><th>7</th><td>382.204</td><td>6.0</td><td>308</td></tr><tr><th>8</th><td>290.149</td><td>7.0</td><td>308</td></tr><tr><th>9</th><td>430.585</td><td>8.0</td><td>308</td></tr><tr><th>10</th><td>466.353</td><td>9.0</td><td>308</td></tr><tr><th>11</th><td>222.734</td><td>0.0</td><td>309</td></tr><tr><th>12</th><td>205.266</td><td>1.0</td><td>309</td></tr><tr><th>13</th><td>202.978</td><td>2.0</td><td>309</td></tr><tr><th>14</th><td>204.707</td><td>3.0</td><td>309</td></tr><tr><th>15</th><td>207.716</td><td>4.0</td><td>309</td></tr><tr><th>16</th><td>215.962</td><td>5.0</td><td>309</td></tr><tr><th>17</th><td>213.63</td><td>6.0</td><td>309</td></tr><tr><th>18</th><td>217.727</td><td>7.0</td><td>309</td></tr><tr><th>19</th><td>224.296</td><td>8.0</td><td>309</td></tr><tr><th>20</th><td>237.314</td><td>9.0</td><td>309</td></tr><tr><th>21</th><td>199.054</td><td>0.0</td><td>310</td></tr><tr><th>22</th><td>194.332</td><td>1.0</td><td>310</td></tr><tr><th>23</th><td>234.32</td><td>2.0</td><td>310</td></tr><tr><th>24</th><td>232.842</td><td>3.0</td><td>310</td></tr><tr><th>25</th><td>229.307</td><td>4.0</td><td>310</td></tr><tr><th>26</th><td>220.458</td><td>5.0</td><td>310</td></tr><tr><th>27</th><td>235.421</td><td>6.0</td><td>310</td></tr><tr><th>28</th><td>255.751</td><td>7.0</td><td>310</td></tr><tr><th>29</th><td>261.012</td><td>8.0</td><td>310</td></tr><tr><th>30</th><td>247.515</td><td>9.0</td><td>310</td></tr><tr><th>31</th><td>321.543</td><td>0.0</td><td>330</td></tr><tr><th>32</th><td>300.4</td><td>1.0</td><td>330</td></tr><tr><th>33</th><td>283.856</td><td>2.0</td><td>330</td></tr><tr><th>34</th><td>285.133</td><td>3.0</td><td>330</td></tr><tr><th>35</th><td>285.797</td><td>4.0</td><td>330</td></tr><tr><th>36</th><td>297.586</td><td>5.0</td><td>330</td></tr><tr><th>37</th><td>280.24</td><td>6.0</td><td>330</td></tr><tr><th>38</th><td>318.261</td><td>7.0</td><td>330</td></tr><tr><th>39</th><td>305.349</td><td>8.0</td><td>330</td></tr><tr><th>40</th><td>354.049</td><td>9.0</td><td>330</td></tr><tr><th>41</th><td>287.608</td><td>0.0</td><td>331</td></tr><tr><th>42</th><td>285.0</td><td>1.0</td><td>331</td></tr><tr><th>43</th><td>301.821</td><td>2.0</td><td>331</td></tr><tr><th>44</th><td>320.115</td><td>3.0</td><td>331</td></tr><tr><th>45</th><td>316.277</td><td>4.0</td><td>331</td></tr><tr><th>46</th><td>293.319</td><td>5.0</td><td>331</td></tr><tr><th>47</th><td>290.075</td><td>6.0</td><td>331</td></tr><tr><th>48</th><td>334.818</td><td>7.0</td><td>331</td></tr><tr><th>49</th><td>293.747</td><td>8.0</td><td>331</td></tr><tr><th>50</th><td>371.581</td><td>9.0</td><td>331</td></tr><tr><th>51</th><td>234.861</td><td>0.0</td><td>332</td></tr><tr><th>52</th><td>242.812</td><td>1.0</td><td>332</td></tr><tr><th>53</th><td>272.961</td><td>2.0</td><td>332</td></tr><tr><th>54</th><td>309.769</td><td>3.0</td><td>332</td></tr><tr><th>55</th><td>317.463</td><td>4.0</td><td>332</td></tr><tr><th>56</th><td>309.998</td><td>5.0</td><td>332</td></tr><tr><th>57</th><td>454.162</td><td>6.0</td><td>332</td></tr><tr><th>58</th><td>346.831</td><td>7.0</td><td>332</td></tr><tr><th>59</th><td>330.3</td><td>8.0</td><td>332</td></tr><tr><th>60</th><td>253.864</td><td>9.0</td><td>332</td></tr><tr><th>61</th><td>283.842</td><td>0.0</td><td>333</td></tr><tr><th>62</th><td>289.555</td><td>1.0</td><td>333</td></tr><tr><th>63</th><td>276.769</td><td>2.0</td><td>333</td></tr><tr><th>64</th><td>299.81</td><td>3.0</td><td>333</td></tr><tr><th>65</th><td>297.171</td><td>4.0</td><td>333</td></tr><tr><th>66</th><td>338.166</td><td>5.0</td><td>333</td></tr><tr><th>67</th><td>332.026</td><td>6.0</td><td>333</td></tr><tr><th>68</th><td>348.84</td><td>7.0</td><td>333</td></tr><tr><th>69</th><td>333.36</td><td>8.0</td><td>333</td></tr><tr><th>70</th><td>362.043</td><td>9.0</td><td>333</td></tr><tr><th>71</th><td>265.473</td><td>0.0</td><td>334</td></tr><tr><th>72</th><td>276.201</td><td>1.0</td><td>334</td></tr><tr><th>73</th><td>243.365</td><td>2.0</td><td>334</td></tr><tr><th>74</th><td>254.672</td><td>3.0</td><td>334</td></tr><tr><th>75</th><td>279.024</td><td>4.0</td><td>334</td></tr><tr><th>76</th><td>284.191</td><td>5.0</td><td>334</td></tr><tr><th>77</th><td>305.525</td><td>6.0</td><td>334</td></tr><tr><th>78</th><td>331.523</td><td>7.0</td><td>334</td></tr><tr><th>79</th><td>335.747</td><td>8.0</td><td>334</td></tr><tr><th>80</th><td>377.299</td><td>9.0</td><td>334</td></tr><tr><th>81</th><td>241.608</td><td>0.0</td><td>335</td></tr><tr><th>82</th><td>273.947</td><td>1.0</td><td>335</td></tr><tr><th>83</th><td>254.491</td><td>2.0</td><td>335</td></tr><tr><th>84</th><td>270.802</td><td>3.0</td><td>335</td></tr><tr><th>85</th><td>251.452</td><td>4.0</td><td>335</td></tr><tr><th>86</th><td>254.636</td><td>5.0</td><td>335</td></tr><tr><th>87</th><td>245.452</td><td>6.0</td><td>335</td></tr><tr><th>88</th><td>235.311</td><td>7.0</td><td>335</td></tr><tr><th>89</th><td>235.754</td><td>8.0</td><td>335</td></tr><tr><th>90</th><td>237.247</td><td>9.0</td><td>335</td></tr><tr><th>91</th><td>312.367</td><td>0.0</td><td>337</td></tr><tr><th>92</th><td>313.806</td><td>1.0</td><td>337</td></tr><tr><th>93</th><td>291.611</td><td>2.0</td><td>337</td></tr><tr><th>94</th><td>346.122</td><td>3.0</td><td>337</td></tr><tr><th>95</th><td>365.732</td><td>4.0</td><td>337</td></tr><tr><th>96</th><td>391.839</td><td>5.0</td><td>337</td></tr><tr><th>97</th><td>404.26</td><td>6.0</td><td>337</td></tr><tr><th>98</th><td>416.692</td><td>7.0</td><td>337</td></tr><tr><th>99</th><td>455.864</td><td>8.0</td><td>337</td></tr><tr><th>100</th><td>458.917</td><td>9.0</td><td>337</td></tr><tr><th>101</th><td>236.103</td><td>0.0</td><td>349</td></tr><tr><th>102</th><td>230.317</td><td>1.0</td><td>349</td></tr><tr><th>103</th><td>238.926</td><td>2.0</td><td>349</td></tr><tr><th>104</th><td>254.922</td><td>3.0</td><td>349</td></tr><tr><th>105</th><td>250.71</td><td>4.0</td><td>349</td></tr><tr><th>106</th><td>269.774</td><td>5.0</td><td>349</td></tr><tr><th>107</th><td>281.565</td><td>6.0</td><td>349</td></tr><tr><th>108</th><td>308.102</td><td>7.0</td><td>349</td></tr><tr><th>109</th><td>336.281</td><td>8.0</td><td>349</td></tr><tr><th>110</th><td>351.645</td><td>9.0</td><td>349</td></tr><tr><th>111</th><td>256.297</td><td>0.0</td><td>350</td></tr><tr><th>112</th><td>243.454</td><td>1.0</td><td>350</td></tr><tr><th>113</th><td>256.205</td><td>2.0</td><td>350</td></tr><tr><th>114</th><td>255.527</td><td>3.0</td><td>350</td></tr><tr><th>115</th><td>268.916</td><td>4.0</td><td>350</td></tr><tr><th>116</th><td>329.725</td><td>5.0</td><td>350</td></tr><tr><th>117</th><td>379.445</td><td>6.0</td><td>350</td></tr><tr><th>118</th><td>362.918</td><td>7.0</td><td>350</td></tr><tr><th>119</th><td>394.487</td><td>8.0</td><td>350</td></tr><tr><th>120</th><td>389.053</td><td>9.0</td><td>350</td></tr><tr><th>121</th><td>250.526</td><td>0.0</td><td>351</td></tr><tr><th>122</th><td>300.058</td><td>1.0</td><td>351</td></tr><tr><th>123</th><td>269.894</td><td>2.0</td><td>351</td></tr><tr><th>124</th><td>280.589</td><td>3.0</td><td>351</td></tr><tr><th>125</th><td>271.827</td><td>4.0</td><td>351</td></tr><tr><th>126</th><td>304.634</td><td>5.0</td><td>351</td></tr><tr><th>127</th><td>287.747</td><td>6.0</td><td>351</td></tr><tr><th>128</th><td>266.596</td><td>7.0</td><td>351</td></tr><tr><th>129</th><td>321.542</td><td>8.0</td><td>351</td></tr><tr><th>130</th><td>347.565</td><td>9.0</td><td>351</td></tr><tr><th>131</th><td>221.677</td><td>0.0</td><td>352</td></tr><tr><th>132</th><td>298.194</td><td>1.0</td><td>352</td></tr><tr><th>133</th><td>326.878</td><td>2.0</td><td>352</td></tr><tr><th>134</th><td>346.856</td><td>3.0</td><td>352</td></tr><tr><th>135</th><td>348.74</td><td>4.0</td><td>352</td></tr><tr><th>136</th><td>352.829</td><td>5.0</td><td>352</td></tr><tr><th>137</th><td>354.427</td><td>6.0</td><td>352</td></tr><tr><th>138</th><td>360.433</td><td>7.0</td><td>352</td></tr><tr><th>139</th><td>375.641</td><td>8.0</td><td>352</td></tr><tr><th>140</th><td>388.542</td><td>9.0</td><td>352</td></tr><tr><th>141</th><td>271.923</td><td>0.0</td><td>369</td></tr><tr><th>142</th><td>268.437</td><td>1.0</td><td>369</td></tr><tr><th>143</th><td>257.242</td><td>2.0</td><td>369</td></tr><tr><th>144</th><td>277.657</td><td>3.0</td><td>369</td></tr><tr><th>145</th><td>314.822</td><td>4.0</td><td>369</td></tr><tr><th>146</th><td>317.214</td><td>5.0</td><td>369</td></tr><tr><th>147</th><td>298.135</td><td>6.0</td><td>369</td></tr><tr><th>148</th><td>348.123</td><td>7.0</td><td>369</td></tr><tr><th>149</th><td>340.28</td><td>8.0</td><td>369</td></tr><tr><th>150</th><td>366.513</td><td>9.0</td><td>369</td></tr><tr><th>151</th><td>225.264</td><td>0.0</td><td>370</td></tr><tr><th>152</th><td>234.524</td><td>1.0</td><td>370</td></tr><tr><th>153</th><td>238.901</td><td>2.0</td><td>370</td></tr><tr><th>154</th><td>240.473</td><td>3.0</td><td>370</td></tr><tr><th>155</th><td>267.537</td><td>4.0</td><td>370</td></tr><tr><th>156</th><td>344.194</td><td>5.0</td><td>370</td></tr><tr><th>157</th><td>281.148</td><td>6.0</td><td>370</td></tr><tr><th>158</th><td>347.586</td><td>7.0</td><td>370</td></tr><tr><th>159</th><td>365.163</td><td>8.0</td><td>370</td></tr><tr><th>160</th><td>372.229</td><td>9.0</td><td>370</td></tr><tr><th>161</th><td>269.88</td><td>0.0</td><td>371</td></tr><tr><th>162</th><td>272.443</td><td>1.0</td><td>371</td></tr><tr><th>163</th><td>277.899</td><td>2.0</td><td>371</td></tr><tr><th>164</th><td>281.789</td><td>3.0</td><td>371</td></tr><tr><th>165</th><td>279.171</td><td>4.0</td><td>371</td></tr><tr><th>166</th><td>284.512</td><td>5.0</td><td>371</td></tr><tr><th>167</th><td>259.266</td><td>6.0</td><td>371</td></tr><tr><th>168</th><td>304.631</td><td>7.0</td><td>371</td></tr><tr><th>169</th><td>350.781</td><td>8.0</td><td>371</td></tr><tr><th>170</th><td>369.469</td><td>9.0</td><td>371</td></tr><tr><th>171</th><td>269.412</td><td>0.0</td><td>372</td></tr><tr><th>172</th><td>273.474</td><td>1.0</td><td>372</td></tr><tr><th>173</th><td>297.597</td><td>2.0</td><td>372</td></tr><tr><th>174</th><td>310.632</td><td>3.0</td><td>372</td></tr><tr><th>175</th><td>287.173</td><td>4.0</td><td>372</td></tr><tr><th>176</th><td>329.608</td><td>5.0</td><td>372</td></tr><tr><th>177</th><td>334.482</td><td>6.0</td><td>372</td></tr><tr><th>178</th><td>343.22</td><td>7.0</td><td>372</td></tr><tr><th>179</th><td>369.142</td><td>8.0</td><td>372</td></tr><tr><th>180</th><td>364.124</td><td>9.0</td><td>372</td></tr></tbody></table>
+
+<p>we fit a model with fixed effects for the intercept and the slope with respect to days of sleep deprivation and, possibly correlated, random effects for each of these coefficients by <code>Subject</code>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>f1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nd'>@formula</span><span class='hljl-t'> </span><span class='hljl-n'>Reaction</span><span class='hljl-t'> </span><span class='hljl-oB'>~</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>Days</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-ni'>1</span><span class='hljl-oB'>+</span><span class='hljl-n'>Days</span><span class='hljl-oB'>|</span><span class='hljl-n'>Subject</span><span class='hljl-p'>)</span><span class='hljl-t'>
+</span><span class='hljl-n'>m1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fit</span><span class='hljl-p'>(</span><span class='hljl-n'>MixedModel</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>f1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>sleepstudy</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+Linear mixed model fit by maximum likelihood
+ Reaction ~ 1 &#43; Days &#43; &#40;1 &#43; Days | Subject&#41;
+   logLik   -2 logLik     AIC        BIC    
+ -875.96967 1751.93934 1763.93934 1783.09709
+
+Variance components:
+              Column    Variance  Std.Dev.   Corr.
+ Subject  &#40;Intercept&#41;  565.51069 23.780469
+          Days          32.68212  5.716828  0.08
+ Residual              654.94145 25.591824
+ Number of obs: 180; levels of grouping factors: 18
+
+  Fixed-effects parameters:
+───────────────────────────────────────────────────
+             Estimate  Std.Error   z value  P&#40;&gt;|z|&#41;
+───────────────────────────────────────────────────
+&#40;Intercept&#41;  251.405     6.63226  37.9064    &lt;1e-99
+Days          10.4673    1.50224   6.96781   &lt;1e-11
+───────────────────────────────────────────────────
+</pre>
+
+
+<p>The &quot;estimated&quot; random effects from this model are eighteen vectors, one for each subject, and each of length two &#40;deviation for the intercept and for the slope&#41;.  These are returned as a <span class="math">$2\times 18$</span> matrix.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-nf'>ranef</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+2×18 Array&#123;Float64,2&#125;:
+ 2.81582  -40.0484   -38.4331  22.8321   …  -24.7101   0.723262  12.1189
+ 9.07551   -8.64408   -5.5134  -4.65872       4.6597  -0.971053   1.3107
+</pre>
+
+
+<p>The fixed-effects coefficients are the typical values for the population - initial reaction time of about 250 ms. and about 10.5 ms. increase in reaction time per day of sleep deprivation.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>fixef</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+2-element Array&#123;Float64,1&#125;:
+ 251.40510484848585 
+  10.467285959595696
+</pre>
+
+
+<p>For this model the matrix <span class="math">$\mathbf{\lambda}$</span> is estimated as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>λ</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>λ</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+2×2 LinearAlgebra.LowerTriangular&#123;Float64,Array&#123;Float64,2&#125;&#125;:
+ 0.929221    ⋅      
+ 0.0181684  0.222645
+</pre>
+
+
+<p>and the &#40;maximum likelihood&#41; estimate of <span class="math">$\sigma^2$</span>, as shown in the &quot;Variance components&quot; table, is</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>σ²</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>varest</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+654.9414513956141
+</pre>
+
+
+<p>Thus the &#40;maximum likelihood&#41; estimate of the covariance matrix <span class="math">$\Sigma$</span> is</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Σ</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>σ²</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-n'>λ</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-n'>λ</span><span class='hljl-oB'>&#39;</span>
+</pre>
+
+
+<pre class="output">
+2×2 Array&#123;Float64,2&#125;:
+ 565.511  11.057 
+  11.057  32.6821
+</pre>
+
+
+<p>The correlation shown in the &quot;Variance components&quot; table can be evaluated as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Σ</span><span class='hljl-p'>[</span><span class='hljl-ni'>2</span><span class='hljl-p'>,</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-nf'>sqrt</span><span class='hljl-p'>(</span><span class='hljl-n'>Σ</span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-n'>Σ</span><span class='hljl-p'>[</span><span class='hljl-ni'>2</span><span class='hljl-p'>,</span><span class='hljl-ni'>2</span><span class='hljl-p'>])</span>
+</pre>
+
+
+<pre class="output">
+0.08133222508252107
+</pre>
+
+
+<h2>The Big Picture</h2>
+<p>Although it is tempting to construct the model on a per-subject basis it is ultimately easier to consider the entire set of responses and the collection of all of the random effects together.  There are two reasons for this.  First, the parameters must be estimated from the complete data set.  Second, in situations where there is more than one grouping factor for the random effects it may not be possible to partition the responses according to the grouping factor.  In the sleepstudy example the 180 observations can be partitioned into eighteen groups of ten observations on each of the eighteen subjects.  However, in an example we will consider below each observation is on one of 56 subjects and one of 32 items and those classifications are <em>crossed</em>.  That is, each subject is tested on each item and each item is tested on each subject.  &#40;Well, that was the plan at least.  As often happens a few observations were erroneously recorded so the factors are not completely crossed in the data after cleaning.&#41;</p>
+<p>In any case, we write <span class="math">$\mathbf{b}$</span> for the complete random-effects vector &#40;in this case a 36-dimensional vector formed from the <span class="math">$2\times 18$</span> matrix in <em>column-major</em> order&#41;.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>b</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>vec</span><span class='hljl-p'>(</span><span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-nf'>ranef</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)))</span>
+</pre>
+
+
+<pre class="output">
+36-element Array&#123;Float64,1&#125;:
+   2.8158200490125838
+   9.075511548037026 
+ -40.04844234918468  
+  -8.644079360686241 
+ -38.433063979133    
+  -5.513397982522659 
+  22.832111258667826 
+  -4.658717238166971 
+  21.549839802851338 
+  -2.9444927908154335
+   ⋮                 
+   3.5617127699268583
+   3.258535296765332 
+   0.8717107920221134
+ -24.71014089399536  
+   4.659700763420342 
+   0.7232619333931269
+  -0.9710526142697629
+  12.118907860302325 
+   1.3106980662927796
+</pre>
+
+
+<p>In the model the unconditional distribution of the random variable <span class="math">$\mathcal{B}$</span> is</p>
+<p class="math">\[
+\mathcal{B}\sim\mathcal{N}\left(\mathbf{0},\sigma^2\mathbf{\Lambda}\mathbf{\Lambda}^\prime\right)
+\]</p>
+<p>and the conditional distribution of the response vector, <span class="math">$\mathcal{Y}$</span>, is</p>
+<p class="math">\[
+(\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim\mathcal{N}\left(\mathbf{X\beta}+\mathbf{Zb}, \sigma^2\mathbf{I}_n\right)
+\]</p>
+<p>The model matrix <span class="math">$\mathbf{X}$</span> for the fixed-effects has the usual form</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Int</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>X</span><span class='hljl-p'>)</span><span class='hljl-t'>  </span><span class='hljl-cs'># display as Int to reduce clutter</span>
+</pre>
+
+
+<pre class="output">
+180×2 Array&#123;Int64,2&#125;:
+ 1  0
+ 1  1
+ 1  2
+ 1  3
+ 1  4
+ 1  5
+ 1  6
+ 1  7
+ 1  8
+ 1  9
+ ⋮   
+ 1  1
+ 1  2
+ 1  3
+ 1  4
+ 1  5
+ 1  6
+ 1  7
+ 1  8
+ 1  9
+</pre>
+
+
+<p>but the model matrix <span class="math">$\mathbf{Z}$</span> for the random effects is very sparse.  That is, most of the entries in <span class="math">$\mathbf{Z}$</span> are zero.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Int</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>reterms</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+180×36 Array&#123;Int64,2&#125;:
+ 1  0  0  0  0  0  0  0  0  0  0  0  0  …  0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  1  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  2  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  3  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  4  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  5  0  0  0  0  0  0  0  0  0  0  0  …  0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  6  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  7  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  8  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ 1  9  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  0 
+ 0
+ ⋮              ⋮              ⋮        ⋱     ⋮              ⋮             
+ ⋮
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 1
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 2
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 3
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 4
+ 0  0  0  0  0  0  0  0  0  0  0  0  0  …  0  0  0  0  0  0  0  0  0  0  1 
+ 5
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 6
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 7
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 8
+ 0  0  0  0  0  0  0  0  0  0  0  0  0     0  0  0  0  0  0  0  0  0  0  1 
+ 9
+</pre>
+
+
+<p>In practice <span class="math">$\mathbf{Z}$</span> is stored and manipulated as a special type of sparse matrix.</p>
+<p>The matrix <span class="math">$\Lambda$</span> is block-diagonal consisting of 18 diagonal blocks of size <span class="math">$2\times 2$</span>, each of which is a copy of <span class="math">$\lambda$</span>.  It could be written as a <a href="https://en.wikipedia.org/wiki/Kronecker_product">Kronecker product</a></p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>Λ</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>kron</span><span class='hljl-p'>(</span><span class='hljl-nf'>I</span><span class='hljl-p'>(</span><span class='hljl-ni'>18</span><span class='hljl-p'>),</span><span class='hljl-t'> </span><span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>λ</span><span class='hljl-p'>))</span>
+</pre>
+
+
+<pre class="output">
+36×36 Array&#123;Float64,2&#125;:
+ 0.929221   0.0       0.0        0.0       …  0.0       0.0        0.0     
+ 0.0181684  0.222645  0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.929221   0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0181684  0.222645     0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0       …  0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ ⋮                                         ⋱                       ⋮       
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0       …  0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.222645  0.0        0.0     
+ 0.0        0.0       0.0        0.0          0.0       0.929221   0.0     
+ 0.0        0.0       0.0        0.0       …  0.0       0.0181684  0.222645
+</pre>
+
+
+<p>but there is no need to actually construct <span class="math">$\mathbf{\Lambda}$</span>.  It is completely determined by <span class="math">$\mathbf{\lambda}$</span>.</p>
+<h2>Spherical random effects</h2>
+<p>One of the many useful properties of the normal distribution is that a scalar normal distribution, <span class="math">$\mathcal{X}\sim\mathcal{N}(\mu,\sigma^2)$</span>, can be expressed in terms of the <em>standard normal</em> distribution, <span class="math">$\mathcal{Z}\sim\mathcal{N}(0,1)$</span> as</p>
+<p class="math">\[
+\mathcal{X} = \mu + \sigma \mathcal{Z}
+\]</p>
+<p>A similar result holds for the multivariate normal distribution.  The random effects vector, <span class="math">$\mathcal{B}$</span>, with distribution <span class="math">$\mathcal{N}(\mathbf{0},\Sigma)$</span> can be generated from a &quot;spherical&quot; random effects vector, <span class="math">$\mathcal{U}$</span>, as</p>
+<p class="math">\[
+\mathcal{B} = \Lambda \mathcal{U}\quad\mathrm{where}\quad\mathcal{U}\sim\mathcal{N}(\mathbf{0},\sigma^2\mathbf{I}_q)
+\]</p>
+<p>and <span class="math">$q$</span> is the dimension of the random-effects vector &#40;36 in our example&#41;.</p>
+<p>&#40;Recall that a multivariate normal distribution with covariance matrix <span class="math">$\sigma^2\mathbf{I}$</span> is called a &quot;spherical normal&quot; because the contours of constant probability density are spheres.  The random effects vector <span class="math">$\mathcal{U}$</span> has such a spherical distribution.&#41;</p>
+<p>Now the conditional distribution of the response, given the random effects, can be written in terms of <span class="math">$\mathcal{U}$</span> as</p>
+<p class="math">\[
+(\mathcal{Y}|\mathcal{U}=\mathbf{u})\sim\mathcal{N}\left(\mathbf{X\beta}+\mathbf{Z\Lambda u}, \sigma^2\mathbf{I}_n\right)
+\]</p>
+<p>The joint probability density for <span class="math">$\mathcal{Y}$</span> and <span class="math">$\mathcal{U}$</span> is the product of the conditional density of <span class="math">$\mathcal{Y}|\mathcal{U}=\mathbf{u}$</span> and the unconditional density of <span class="math">$\mathcal{U}$</span>.</p>
+<p class="math">\[
+\begin{aligned}
+f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})&= \frac{1}{(2\pi\sigma^2)^{n/2}}\exp\left(-\frac{\|\mathbf{y}-\mathbf{X\beta}-\mathbf{Z\Lambda u}\|^2}{2\sigma^2}\right)\,\frac{1}{(2\pi\sigma^2)^{q/2}}\exp\left(-\frac{\|\mathbf{u}\|^2}{2\sigma^2}\right)\\
+&=\frac{1}{(2\pi\sigma^2)^{(n+q)/2}}\exp\left(-\frac{\|\mathbf{y}-\mathbf{X\beta}-\mathbf{Z\Lambda u}\|^2+\|\mathbf{u}\|^2}{2\sigma^2}\right)
+\end{aligned}
+\]</p>
+<p>Evaluating the likelihood requires the marginal distribution of <span class="math">$\mathcal{Y}$</span>.  This can be obtained by integrating the joint distribution, <span class="math">$f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})$</span>, evaluated at the observed <span class="math">$\mathbf{y}$</span>, with respect to <span class="math">$\mathbf{u}$</span>. There is an analytic solution to this integral.  To derive this solution, we first write the penalized sum of squared residuals in a somewhat unusual but very useful form.  Let <span class="math">$\mathbf{\theta}$</span> be the vector of parameters that determine <span class="math">$\mathbf{\lambda}$</span>.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>show</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>θ</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+&#91;0.9292213288149662, 0.018168393450877257, 0.22264486671069741&#93;
+</pre>
+
+
+<p>In this case, <span class="math">$\mathbf{\theta}$</span> consists if the elements of the lower triangle of <span class="math">$\mathbf{\lambda}$</span>.  What we will show is that, given a value of <span class="math">$\mathbf{\theta}$</span> the maximum of the log-likelihood for that value of <span class="math">$\mathbf{\theta}$</span> and any value of <span class="math">$\mathbf{\beta}$</span> and <span class="math">$\sigma$</span> can be determined from a matrix decomposition, specifically a Cholesky decomposition shown below.  This is called <em>profiling</em> the log likelihood.</p>
+<p>For the purposes of the optimization the objective is on the <a href="https://en.wikipedia.org/wiki/Deviance_&#40;statistics&#41;"><em>deviance</em></a> scale, which is negative twice the log-likelihood.  A summary of the optimization can be obtained as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>optsum</span>
+</pre>
+
+
+<pre class="output">
+Initial parameter vector: &#91;1.0, 0.0, 1.0&#93;
+Initial objective value:  1784.642296192471
+
+Optimizer &#40;from NLopt&#41;:   LN_BOBYQA
+Lower bounds:             &#91;0.0, -Inf, 0.0&#93;
+ftol_rel:                 1.0e-12
+ftol_abs:                 1.0e-8
+xtol_rel:                 0.0
+xtol_abs:                 &#91;1.0e-10, 1.0e-10, 1.0e-10&#93;
+initial_step:             &#91;0.75, 1.0, 0.75&#93;
+maxfeval:                 -1
+
+Function evaluations:     57
+Final parameter vector:   &#91;0.9292213288149662, 0.018168393450877257, 0.2226
+4486671069741&#93;
+Final objective value:    1751.9393444647023
+Return code:              FTOL_REACHED
+</pre>
+
+
+<p>It required fewer than 60 evaluations of the objective function to obtain the maximum likelihood estimates of <span class="math">$\mathbf{\theta}$</span> and, with them, the estimates of all the other parameters.</p>
+<p>To evaluate the log-likelihood we write the penalized sum of squared residuals in the joint density, <span class="math">$f_{\mathcal{Y},\mathcal{U}}(\mathbf{y,u})$</span>, as</p>
+<p class="math">\[
+\begin{aligned}
+r^2_\mathbf{\theta}(\mathbf{u},\mathbf{\beta}) &=  \|\mathbf{y}-\mathbf{X\beta}-\mathbf{Z\Lambda_\theta u}\|^2+\|\mathbf{u}\|^2\\
+&=\left\|\begin{bmatrix}
+\mathbf{Z\Lambda}&\mathbf{X}&\mathbf{y}\\
+\mathbf{I}_q&\mathbf{0}&\mathbf{0}
+\end{bmatrix}\begin{bmatrix}-\mathbf{u}\\ -\mathbf{\beta} \\ 1\end{bmatrix}\right\|^2 \\
+&= \begin{bmatrix}-\mathbf{u}&-\mathbf{\beta}&1\end{bmatrix}
+\begin{bmatrix}
+\mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{Z\Lambda}+\mathbf{I} & \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{X} & \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{y} \\
+\mathbf{X}^\prime\mathbf{Z\Lambda} & \mathbf{X}^\prime\mathbf{X} & \mathbf{X}^\prime\mathbf{y} \\
+\mathbf{y}^\prime\mathbf{Z\Lambda} & \mathbf{y}^\prime\mathbf{X} & \mathbf{y}^\prime\mathbf{y}
+\end{bmatrix}
+\begin{bmatrix}-\mathbf{u}\\ -\mathbf{\beta} \\ 1\end{bmatrix}\\
+&=
+\begin{bmatrix}-\mathbf{u}&-\mathbf{\beta}&1\end{bmatrix}
+\begin{bmatrix}
+\mathbf{R}_{ZZ}^\prime & \mathbf{0} & \mathbf{0} \\
+\mathbf{R}_{ZX}^\prime & \mathbf{R}_{XX}^\prime & \mathbf{0} \\
+\mathbf{r}_{Zy}^\prime & \mathbf{r}_{Xy}^\prime & r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy} \\
+\mathbf{0} & \mathbf{R}_{XX} & \mathbf{r}_{Xy} \\
+\mathbf{0} & \mathbf{0} & r_{yy}
+\end{bmatrix}
+\begin{bmatrix}-\mathbf{u}\\ -\mathbf{\beta} \\ 1\end{bmatrix}\\
+&= \left\|
+\begin{bmatrix}
+\mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy} \\
+\mathbf{0} & \mathbf{R}_{XX} & \mathbf{r}_{Xy} \\
+\mathbf{0} & \mathbf{0} & r_{yy}
+\end{bmatrix}
+\begin{bmatrix}-\mathbf{u}\\ -\mathbf{\beta} \\ 1\end{bmatrix}\right\|^2\\
+&=\|\mathbf{r}_{Zy}-\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{R}_{ZZ}\mathbf{u}\|^2+ \|\mathbf{r}_{Xy}-\mathbf{R}_{XX}\mathbf{\beta}\|^2 + r_{yy}^2\\
+&=r_{yy}^2+\|\mathbf{R}_{XX}\mathbf{\beta}-\mathbf{r}_{Xy}\|^2+\|\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{r}_{Zy}\|^2
+\end{aligned}
+\]</p>
+<p>where</p>
+<p class="math">\[
+\mathbf{R}(\mathbf{\theta})=
+\begin{bmatrix}
+\mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy} \\
+\mathbf{0} & \mathbf{R}_{XX} & \mathbf{r}_{Xy} \\
+\mathbf{0} & \mathbf{0} & r_{yy}
+\end{bmatrix}
+\]</p>
+<p>is the upper triangular, right Cholesky factor of the symmetric, positive definite matrix</p>
+<p class="math">\[
+\begin{bmatrix}
+\mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{Z\Lambda}+\mathbf{I} & \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{X} & \mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{y} \\
+\mathbf{X}^\prime\mathbf{Z\Lambda} & \mathbf{X}^\prime\mathbf{X} & \mathbf{X}^\prime\mathbf{y} \\
+\mathbf{y}^\prime\mathbf{Z\Lambda} & \mathbf{y}^\prime\mathbf{X} & \mathbf{y}^\prime\mathbf{y}
+\end{bmatrix}
+\]</p>
+<p>The sub-matrices on the diagonal, <span class="math">$\mathbf{R}_{ZZ}$</span> and <span class="math">$\mathbf{R}_{XX}$</span>, are upper triangular and <span class="math">$\mathbf{R}_{ZZ}$</span> is sparse.  In our example, <span class="math">$\mathbf{R}_{ZZ}$</span> is <span class="math">$36\times 36$</span> but the only non-zeros are the upper triangles of <span class="math">$18$</span> blocks of size <span class="math">$2\times 2$</span> along the diagonal.  Also, the diagonal elements are, by construction, positive.  Because <span class="math">$\mathbf{R}_{ZZ}$</span> is triangular its determinant, <span class="math">$|\mathbf{R}_{ZZ}|$</span>, is the product of its diagonal elements which also must be positive.</p>
+<p>Furthermore, we can see that, for a fixed value of <span class="math">$\mathbf{\theta}$</span> the minimum <span class="math">$r^2_\mathbf{\theta}(\mathbf{u},\mathbf{\beta})$</span> is <span class="math">$r_{yy}^2$</span> and the conditional estimate of <span class="math">$\mathbf{\beta}$</span> satisfies</p>
+<p class="math">\[
+\mathbf{R}_{XX}\widehat{\mathbf{\beta}}(\mathbf{\theta})=\mathbf{r}_{Xy} .
+\]</p>
+<p>The conditional mode, <span class="math">$\tilde{\mathbf{u}}$</span>, of <span class="math">$\mathcal{U}$</span> given <span class="math">$\mathcal{Y}=\mathbf{y}$</span> is the solution to</p>
+<p class="math">\[
+\mathbf{R}_{ZZ}\tilde{\mathbf{u}}=\mathbf{r}_{Zy}-\mathbf{R}_{ZX}\mathbf{\beta}
+\]</p>
+<p>Technically, <span class="math">$\mathbf{\beta}$</span> and <span class="math">$\mathbf{\theta}$</span> are assumed known because this is a statement about distributions.  In practice, the estimates, <span class="math">$\widehat{\mathbf{\theta}}$</span> and <span class="math">$\widehat{\beta}$</span>, are plugged in.</p>
+<p>A Cholesky decomposition can be written in terms of the lower triangular factor on the left, <span class="math">$\mathbf{L}$</span>, or in terms of <span class="math">$\mathbf{R}$</span> on the right.  There is a slight technical advantage in evaluating <span class="math">$\mathbf{L}$</span> in the <code>MixedModels</code> package so it is <span class="math">$\mathbf{L}$</span> that is evaluated and stored.  However, the theory is a bit easier to see in terms of <span class="math">$\mathbf{R}$</span>, which we can obtain as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>UpperTriangular</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>L</span><span class='hljl-oB'>&#39;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+39×39 LinearAlgebra.UpperTriangular&#123;Float64,LinearAlgebra.Adjoint&#123;Float64,B
+lockArrays.BlockArray&#123;Float64,2,AbstractArray&#123;Float64,2&#125;&#125;&#125;&#125;:
+ 3.35381  3.11966  0.0      0.0      …  3.01442   14.0118   1041.06  
+  ⋅       2.32279  0.0      0.0         0.264786   8.49909   249.639 
+  ⋅        ⋅       3.35381  3.11966     3.01442   14.0118    649.814 
+  ⋅        ⋅        ⋅       2.32279     0.264786   8.49909    73.5187
+  ⋅        ⋅        ⋅        ⋅          3.01442   14.0118    699.068 
+  ⋅        ⋅        ⋅        ⋅       …  0.264786   8.49909   105.851 
+  ⋅        ⋅        ⋅        ⋅          3.01442   14.0118    915.382 
+  ⋅        ⋅        ⋅        ⋅          0.264786   8.49909   102.27  
+  ⋅        ⋅        ⋅        ⋅          3.01442   14.0118    935.125 
+  ⋅        ⋅        ⋅        ⋅          0.264786   8.49909   120.416 
+ ⋮                                   ⋱                               
+  ⋅        ⋅        ⋅        ⋅       …  3.01442   14.0118    887.382 
+  ⋅        ⋅        ⋅        ⋅          0.264786   8.49909   209.185 
+  ⋅        ⋅        ⋅        ⋅          3.01442   14.0118    893.313 
+  ⋅        ⋅        ⋅        ⋅          0.264786   8.49909   145.253 
+  ⋅        ⋅        ⋅        ⋅          3.01442   14.0118    963.293 
+  ⋅        ⋅        ⋅        ⋅       …  0.264786   8.49909   166.733 
+  ⋅        ⋅        ⋅        ⋅          3.89572    2.36568  1004.17  
+  ⋅        ⋅        ⋅        ⋅           ⋅        17.0358    178.319 
+  ⋅        ⋅        ⋅        ⋅           ⋅          ⋅        343.35
+</pre>
+
+
+<p>To evaluate the likelihood,</p>
+<p class="math">\[
+L(\mathbf{\theta},\mathbf{\beta},\sigma|\mathbf{y}) = \int_\mathbf{u} f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})\, d\mathbf{u}
+\]</p>
+<p>we isolate the part of the joint density that depends on <span class="math">$\mathbf{u}$</span> and perform a change of variable to</p>
+<p class="math">\[
+\mathbf{v}=\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{r}_{Zy} .
+\]</p>
+<p>From the properties of the multivariate Gaussian distribution</p>
+<p class="math">\[
+\begin{aligned}
+\int_{\mathbf{u}}\frac{1}{(2\pi\sigma^2)^{q/2}}\exp\left(-
+\frac{\|\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\mathbf{\beta}-\mathbf{r}_{Zy}\|^2}{2\sigma^2}\right)\,d\mathbf{u}
+&=\int_{\mathbf{v}}\frac{1}{(2\pi\sigma^2)^{q/2}}\exp\left(-\frac{\|\mathbf{v}\|^2}{2\sigma^2}\right)|\mathbf{R}_{ZZ}|^{-1}\,d\mathbf{v}\\
+&=|\mathbf{R}_{ZZ}|^{-1}
+\end{aligned}
+\]</p>
+<p>from which we obtain the likelihood as</p>
+<p class="math">\[
+L(\mathbf{\theta},\mathbf{\beta},\sigma)=\frac{|\mathbf{R}_{ZZ}|^{-1}}{(2\pi\sigma^2)^{n/2}}\exp\left(-
+\frac{r_{yy}^2 + \|\mathbf{R}_{XX}(\mathbf{\beta}-\widehat{\mathbf{\beta}})\|^2}{2\sigma^2}\right)
+\]</p>
+<p>If we plug in <span class="math">$\mathbf{\beta}=\widehat{\mathbf{\beta}}$</span> and take the logarithm we can solve for the estimate of <span class="math">$\sigma^2$</span>, given <span class="math">$\mathbf{\theta}$</span></p>
+<p class="math">\[
+\widehat{\sigma^2}=\frac{r_{yy}^2}{n}
+\]</p>
+<p>which gives the <em>profiled log-likelihood</em>, <span class="math">$\ell(\mathbf{\theta}|\mathbf{y})=\log L(\mathbf{\theta},\widehat{\mathbf{\beta}},\widehat{\sigma})$</span> as</p>
+<p class="math">\[
+-2\ell(\mathbf{\theta}|\mathbf{y})=2\log(|\mathbf{R}_{ZZ}|) +
+    n\left(1+\log\left(\frac{2\pi r_{yy}^2(\mathbf{\theta})}{n}\right)\right)
+\]</p>
+<p>This may seem complicated but, relative to other formulations of the model, it is remarkably simple.</p>
+<p>One of the interesting aspects of this formulation is that it is not necessary to solve for the conditional estimate of <span class="math">$\mathbf{\beta}$</span> or the conditional modes of the random effects when evaluating the log-likelihood.  The two values needed for the log-likelihood, <span class="math">$2\log(|\mathbf{R}_{ZZ}|)$</span> and <span class="math">$r_{yy}^2$</span> are obtained directly from the Cholesky factor.  The logarithm of the determinant,</p>
+<p class="math">\[
+2\log(|\mathbf{R}_{ZZ}|) = \log(|\mathbf{\Lambda}^\prime\mathbf{Z}^\prime\mathbf{Z}\mathbf{\Lambda}+\mathbf{I}_q|)
+\]</p>
+<p>is available as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>logdet</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+73.90322050863236
+</pre>
+
+
+<p>and <span class="math">$r_{yy}^2$</span> is available as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>pwrss</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+117889.46125121054
+</pre>
+
+
+<p>which is the square of the element in the lower right corner of either <span class="math">$\mathbf{L}$</span> or <span class="math">$\mathbf{R}$</span></p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>abs2</span><span class='hljl-p'>(</span><span class='hljl-nf'>first</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>L</span><span class='hljl-p'>[</span><span class='hljl-nf'>Block</span><span class='hljl-p'>(</span><span class='hljl-ni'>3</span><span class='hljl-p'>,</span><span class='hljl-ni'>3</span><span class='hljl-p'>)]))</span>
+</pre>
+
+
+<pre class="output">
+117889.46125121054
+</pre>
+
+
+<p>Alternatively, <code>varest</code> returns <span class="math">$\widehat{\sigma^2}$</span></p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>varest</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+654.9414513956141
+</pre>
+
+
+<p>This gives the objective function as</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>logdet</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-nf'>dof_residual</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)</span><span class='hljl-oB'>*</span><span class='hljl-p'>(</span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-nf'>log</span><span class='hljl-p'>(</span><span class='hljl-ni'>2</span><span class='hljl-n'>π</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-nf'>varest</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-p'>)))</span>
+</pre>
+
+
+<pre class="output">
+1751.9393444647023
+</pre>
+
+
+<p>One last technical point, the update of the Cholesky factor, <span class="math">$\mathbf{L}$</span>, for a new value of <span class="math">$\mathbf{\theta}$</span>, which generates <span class="math">$\mathbf{\lambda}$</span> and, hence, <span class="math">$\mathbf{\Lambda}$</span> can start with the model matrices <span class="math">$\mathbf{Z}$</span> and <span class="math">$\mathbf{X}$</span> and the response, <span class="math">$\mathbf{y}$</span> or it can start with the products, <span class="math">$\mathbf{Z}^\prime\mathbf{Z}$</span>, etc.  The package uses the second approach which is more efficient when the number of observations is large relative to the number of random effects.  The non-redundant products are stored in the <code>A</code> field.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>Symmetric</span><span class='hljl-p'>(</span><span class='hljl-n'>m1</span><span class='hljl-oB'>.</span><span class='hljl-n'>A</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:L</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+39×39 LinearAlgebra.Symmetric&#123;Float64,BlockArrays.BlockArray&#123;Float64,2,Abst
+ractArray&#123;Float64,2&#125;&#125;&#125;:
+   10.0      45.0     0.0      0.0      0.0   …    45.0         3421.34    
+ 
+   45.0     285.0     0.0      0.0      0.0       285.0        17191.6     
+ 
+    0.0       0.0    10.0     45.0      0.0        45.0         2152.33    
+ 
+    0.0       0.0    45.0    285.0      0.0       285.0         9872.08    
+ 
+    0.0       0.0     0.0      0.0     10.0        45.0         2310.01    
+ 
+    0.0       0.0     0.0      0.0     45.0   …   285.0        10899.5     
+ 
+    0.0       0.0     0.0      0.0      0.0        45.0         3032.21    
+ 
+    0.0       0.0     0.0      0.0      0.0       285.0        13893.1     
+ 
+    0.0       0.0     0.0      0.0      0.0        45.0         3094.36    
+ 
+    0.0       0.0     0.0      0.0      0.0       285.0        14359.1     
+ 
+    ⋮                                         ⋱                            
+ 
+    0.0       0.0     0.0      0.0      0.0   …    45.0         2917.02    
+ 
+    0.0       0.0     0.0      0.0      0.0       285.0        14616.2     
+ 
+    0.0       0.0     0.0      0.0      0.0        45.0         2949.84    
+ 
+    0.0       0.0     0.0      0.0      0.0       285.0        14032.3     
+ 
+    0.0       0.0     0.0      0.0      0.0        45.0         3178.86    
+ 
+    0.0       0.0     0.0      0.0      0.0 
+ ───────────────────────────────────────────  …   285.0        15237.0     
+ 
+ ───────────────────────────
+   10.0      45.0    10.0     45.0     10.0       810.0        53731.4     
+ 
+   45.0     285.0    45.0    285.0     45.0 
+ ───────────────────────────────────────────     5130.0            2.57335e
+5
+ ───────────────────────────
+ 3421.34  17191.6  2152.33  9872.08  2310.01        2.57335e5      1.66072e
+7
+</pre>
+
+
+<p>Because the experiment is <em>balanced</em>, in the sense that each subject&#39;s reaction time is measured the same number of times and after the same number of days of sleep deprivation, the diagonal blocks in <span class="math">$\mathbf{Z}^\prime\mathbf{Z}$</span> are repetitions of one another.  The number in the lower right-hand corner of <code>A</code> is <span class="math">$\mathbf{y}^\prime\mathbf{y}$</span> or</p>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>sum</span><span class='hljl-p'>(</span><span class='hljl-n'>abs2</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>sleepstudy</span><span class='hljl-oB'>.</span><span class='hljl-n'>Reaction</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+1.660720731910011e7
+</pre>
+
+
+<h2>Mixed-models and shrinkage of estimates</h2>
+<p><a href="https://en.wikipedia.org/wiki/John_Tukey">John Tukey</a> characterized the <em>regularization</em> or <em>shrinkage</em> aspects of mixed-effects models as <em>borrowing strength</em> from the estimates for other subjects in the experiment.  The penalty term in the penalized least squares calculation has the effect of shrinking an individual&#39;s coefficients in the predictor back toward the global estimates.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+df &lt;- coef(lmList(Reaction ~ Days | Subject, sleepstudy))
+fm2 &lt;- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+fclow &lt;- subset(df, `(Intercept)` &lt; 251)
+fchigh &lt;- subset(df, `(Intercept)` &gt; 251)
+cc1 &lt;- as.data.frame(coef(fm2)$Subject)
+names(cc1) &lt;- c(&quot;A&quot;, &quot;B&quot;)
+df &lt;- cbind(df, cc1)
+ff &lt;- fixef(fm2)
+with(df,
+     print(xyplot(`(Intercept)` ~ Days, aspect = 1,
+                  x1 = B, y1 = A,
+                  panel = function(x, y, x1, y1, subscripts, ...) {
+                      panel.grid(h = -1, v = -1)
+                      x1 &lt;- x1[subscripts]
+                      y1 &lt;- y1[subscripts]
+                      larrows(x, y, x1, y1, type = &quot;closed&quot;, length = 0.1,
+                              angle = 15, ...)
+                      lpoints(x, y,
+                              pch = trellis.par.get(&quot;superpose.symbol&quot;)$pch[2],
+                              col = trellis.par.get(&quot;superpose.symbol&quot;)$col[2])
+                      lpoints(x1, y1,
+                              pch = trellis.par.get(&quot;superpose.symbol&quot;)$pch[1],
+                              col = trellis.par.get(&quot;superpose.symbol&quot;)$col[1])
+                      lpoints(ff[2], ff[1],
+                              pch = trellis.par.get(&quot;superpose.symbol&quot;)$pch[3],
+                              col = trellis.par.get(&quot;superpose.symbol&quot;)$col[3])
+                      ltext(fclow[,2], fclow[,1], row.names(fclow),
+                            adj = c(0.5, 1.7))
+                      ltext(fchigh[,2], fchigh[,1], row.names(fchigh),
+                            adj = c(0.5, -0.6))
+                  },
+                  key = list(space = &quot;top&quot;, columns = 3,
+                  text = list(c(&quot;Mixed model&quot;, &quot;Within-group&quot;, &quot;Population&quot;)),
+                  points = list(col = trellis.par.get(&quot;superpose.symbol&quot;)$col[1:3],
+                  pch = trellis.par.get(&quot;superpose.symbol&quot;)$pch[1:3]))
+                  )))
+&quot;&quot;&quot;</span><span class='hljl-p'>;</span>
+</pre>
+
+
+
+<p>Comparing this plot to the original data plot with the lines from the various fits superimposed</p>
+
+
+<pre class='hljl'>
+<span class='hljl-so'>R&quot;&quot;&quot;
+print(xyplot(Reaction ~ Days | Subject, sleepstudy, aspect = &quot;xy&quot;,
+             layout = c(9,2), type = c(&quot;g&quot;, &quot;p&quot;, &quot;r&quot;),
+             coef.list = df[,3:4],
+             panel = function(..., coef.list) {
+                 panel.xyplot(...)
+                 panel.abline(as.numeric(coef.list[packet.number(),]),
+                              col.line = trellis.par.get(&quot;superpose.line&quot;)$col[2],
+                              lty = trellis.par.get(&quot;superpose.line&quot;)$lty[2]
+                              )
+                 panel.abline(fixef(fm2),
+                              col.line = trellis.par.get(&quot;superpose.line&quot;)$col[4],
+                              lty = trellis.par.get(&quot;superpose.line&quot;)$lty[4]
+                              )
+             },
+             index.cond = function(x,y) coef(lm(y ~ x))[1],
+             xlab = &quot;Days of sleep deprivation&quot;,
+             ylab = &quot;Average reaction time (ms)&quot;,
+             key = list(space = &quot;top&quot;, columns = 3,
+             text = list(c(&quot;Within-subject&quot;, &quot;Mixed model&quot;, &quot;Population&quot;)),
+             lines = list(col = trellis.par.get(&quot;superpose.line&quot;)$col[c(2:1,4)],
+             lty = trellis.par.get(&quot;superpose.line&quot;)$lty[c(2:1,4)]))))
+&quot;&quot;&quot;</span><span class='hljl-p'>;</span>
+</pre>
+
+
+
+<p>shows that the fits for those subjects whose data shows a strong linear trend &#40;e.g. 308, 309, 310, 337&#41; are not changed that much.  But those whose data does not define a line well &#40;e.g. 330, 331&#41; are shrunk toward the global fit.</p>
+
+
+<div class="markdown"><h2>Appendix</h2>
+<p>This tutorial is part of the MixedModelsTutorials.jl repository, found at: <a href="https://github.com/RePsychLing/MixedModelsTutorials.jl">https://github.com/RePsychLing/MixedModelsTutorials.jl</a></p>
+</div>
+<div class="markdown"><p>To locally run this tutorial, do the following commands:</p>
+<pre><code>using MixedModelsTutorials
+MixedModelsTutorials.weave_file&#40;&quot;introduction&quot;,&quot;linearmixedeffects.jmd&quot;&#41;</code></pre>
+</div>
+<div class="markdown"><p>Computer Information:</p>
+</div>
+<div class="markdown"><pre><code>Julia Version 1.2.0
+Commit c6da87ff4b &#40;2019-08-20 00:03 UTC&#41;
+Platform Info:
+  OS: Linux &#40;x86_64-pc-linux-gnu&#41;
+  CPU: Intel&#40;R&#41; Core&#40;TM&#41; i5-5300U CPU @ 2.30GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-6.0.1 &#40;ORCJIT, broadwell&#41;
+Environment:
+  JULIA_NUM_THREADS &#61; 2
+</code></pre>
+</div>
+<div class="markdown"><p>Package Information:</p>
+</div>
+<div class="markdown"><pre><code>Status &#96;~/.julia/environments/v1.2/Project.toml&#96;
+&#91;537997a7-5e4e-5d89-9595-2241ea00577e&#93; AbstractPlotting 0.9.10
+&#91;c52e3926-4ff0-5f6e-af25-54175e0327b1&#93; Atom 0.10.1
+&#91;6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf&#93; BenchmarkTools 0.4.3
+&#91;b99e7846-7c00-51b0-8f62-c81ae34c0232&#93; BinaryProvider 0.5.6
+&#91;336ed68f-0bac-5ca0-87d4-7b16caf5d00b&#93; CSV 0.5.12
+&#91;13f3f980-e62b-5c42-98c6-ff1f3baf88f0&#93; CairoMakie 0.1.1
+&#91;324d7699-5711-5eae-9e2f-1d82baa6b597&#93; CategoricalArrays 0.6.0
+&#91;a93c6f00-e57d-5684-b7b6-d8193f3e46c0&#93; DataFrames 0.19.4
+&#91;1313f7d8-7da2-5740-9ea0-a2ca25f37964&#93; DataFramesMeta 0.5.0
+&#91;31a5f54b-26ea-5ae9-a837-f05ce5417438&#93; Debugger 0.6.2
+&#91;31c24e10-a181-5473-b8eb-7969acd0382f&#93; Distributions 0.21.1
+&#91;e30172f5-a6a5-5a46-863b-614d45cd2de4&#93; Documenter 0.23.3
+&#91;f6369f11-7733-5829-9624-2563aa707210&#93; ForwardDiff 0.10.3
+&#91;da1fdf0e-e0ff-5433-a45f-9bb5ff651cb1&#93; FreqTables 0.3.1
+&#91;38e38edf-8417-5370-95a0-9cbb8c7f171a&#93; GLM 1.3.2
+&#91;c91e804a-d5a3-530f-b6f0-dfbca275c004&#93; Gadfly 1.0.1
+&#91;f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f&#93; HDF5 0.12.3
+&#91;7073ff75-c697-5162-941a-fcdaad2a7d2a&#93; IJulia 1.20.0
+&#91;7869d1d1-7146-5819-86e3-90919afe41df&#93; IRTools 0.2.3
+&#91;e5e0dc1b-0480-54bc-9374-aad01c23163d&#93; Juno 0.7.2
+&#91;2fda8390-95c7-5789-9bda-21331edee243&#93; LsqFit 0.8.1
+&#91;ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a&#93; Makie 0.9.5
+&#91;ff71e718-51f3-5ec2-a782-8ffcbfa3c316&#93; MixedModels 2.1.2
+&#91;df1decc4-b7b3-11e9-2182-0db5ca2e8321&#93; MixedModelsTutorials 0.1.0
+&#91;76087f3c-5699-56af-9a33-bf431cd00edd&#93; NLopt 0.5.1
+&#91;6aa54777-d00a-57a2-a775-234c624c12d3&#93; NLreg 0.2.1
+&#91;d9ec5142-1e00-5aa0-9d6a-321866360f50&#93; NamedTupleTools 0.10.0
+&#91;90014a1f-27ba-587c-ab20-58faa44d9150&#93; PDMats 0.9.10
+&#91;14b8a8f1-9102-5b29-a752-f990bacb7fe1&#93; PkgTemplates 0.6.2
+&#91;91a5bcdd-55d7-5caf-9e0b-520d859cae80&#93; Plots 0.26.3
+&#91;2dfb63ee-cc39-5dd5-95bd-886bf059d720&#93; PooledArrays 0.5.2
+&#91;c46f51b8-102a-5cf2-8d2c-8597cb0e0da7&#93; ProfileView 0.4.1
+&#91;d330b81b-6aea-500a-939a-2ce795aea3ee&#93; PyPlot 2.8.2
+&#91;6f49c342-dc21-5d91-9882-a32aef131414&#93; RCall 0.13.4
+&#91;df47a6cb-8c03-5eed-afd8-b6050d6c41da&#93; RData 0.6.3
+&#91;ce6b1742-4840-55fa-b093-852dadbb1d8b&#93; RDatasets 0.6.3
+&#91;295af30f-e4ad-537b-8983-00126c2a3abe&#93; Revise 2.2.0
+&#91;0aa819cd-b072-5ff4-a722-6bc24af294d9&#93; SQLite 0.8.1
+&#91;90137ffa-7385-5640-81b9-e52037218182&#93; StaticArrays 0.11.0
+&#91;2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91&#93; StatsBase 0.32.0
+&#91;65254759-4cff-5aa5-8326-61ce017a8c70&#93; StatsMakie 0.0.6
+&#91;3eaba693-59b7-5ba5-a881-562e759f1c8d&#93; StatsModels 0.6.3
+&#91;f3b207a7-027a-5e70-b257-86293d7955fd&#93; StatsPlots 0.12.0
+&#91;bd369af6-aec1-5ad0-b16a-f7cc5008161c&#93; Tables 0.2.11
+&#91;7ead3172-d87e-440f-bd97-80ef74db0aed&#93; Tutorials 0.1.0
+&#91;9d95f2ec-7b3d-5a63-8d20-e2491e220bb9&#93; TypedTables 1.2.0
+&#91;44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9&#93; Weave 0.9.1
+&#91;e88e6eb3-aa80-5325-afca-941959d7151f&#93; Zygote 0.3.4</code></pre>
+</div>
+
+
+
+          <HR/>
+          <div class="footer"><p>
+          Published from <a href="linearmixedeffects.jmd">linearmixedeffects.jmd</a> using
+          <a href="http://github.com/mpastell/Weave.jl">Weave.jl</a>
+           on 2019-09-24.
+          <p></div>
+
+
+        </div>
+      </div>
+    </div>
+  </BODY>
+</HTML>

@@ -7,11 +7,8 @@ cssfile = joinpath(@__DIR__, "..", "templates", "skeleton_css.css")
 latexfile = joinpath(@__DIR__, "..", "templates", "julia_tex.tpl")
 
 function weave_file(folder,file,build_list=(:script,:html,:notebook); kwargs...)
-  @show build_list
   tmp = joinpath(repo_directory,"tutorials",folder,file)
-  @show tmp
   args = Dict{Symbol,String}(:folder=>folder,:file=>file)
-  @show(args)
   if :script ∈ build_list
     println("Building Script")
     dir = joinpath(repo_directory,"script",folder)
@@ -66,14 +63,14 @@ function tutorial_footer(folder=nothing, file=nothing; remove_homedir=true)
     display("text/markdown", """
     ## Appendix
 
-     This tutorial is part of the MixedModelsTutorials.jl repository, found at: <https://github.com/dmbates/MixedModelsTutorials.jl>
+     This tutorial is part of the MixedModelsTutorials.jl repository, found at: <https://github.com/RePsychLing/MixedModelsTutorials.jl>
     """)
     if folder !== nothing && file !== nothing
         display("text/markdown", """
         To locally run this tutorial, do the following commands:
         ```
-        using DiffEqTutorials
-        DiffEqTutorials.weave_file("$folder","$file")
+        using MixedModelsTutorials
+        MixedModelsTutorials.weave_file("$folder","$file")
         ```
         """)
     end

@@ -1,6 +1,8 @@
 ---
 title: Linear Algebra - solving least squares problems
-author: Douglas Bates
+author:
+- name: Douglas Bates
+  affiliation: U. of Wisconsin - Madison
 ---
 
 # Linear algebra and statistical models

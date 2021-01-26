@@ -9,3 +9,7 @@
 ## Citing
 
 See `CITATION.bib` for the relevant reference(s).
+
+## Acknowledgements
+
+This work was supported by the Center for Interdisciplinary Research, Bielefeld (ZiF) Cooperation Group "Statistical models for psychological and linguistic data".
